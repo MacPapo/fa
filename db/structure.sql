@@ -47,7 +47,37 @@ CREATE TRIGGER contacts_au AFTER UPDATE ON contacts BEGIN
         INSERT INTO contacts_fts(rowid, first_name, last_name, known_as, company_name, email, phone, vat_number, tax_id, notes)
         VALUES (new.id, new.first_name, new.last_name, new.known_as, new.company_name, new.email, new.phone, new.vat_number, new.tax_id, new.notes);
       END;
+CREATE TABLE IF NOT EXISTS "jobs" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "date" date NOT NULL, "start_at" datetime(6), "end_at" datetime(6), "description" text, "notes" text, "with_video" boolean DEFAULT FALSE NOT NULL, "location_id" integer, "legacy_data" json DEFAULT '{}', "display_title" varchar GENERATED ALWAYS AS (COALESCE(NULLIF(TRIM(description), ''), 'Servizio del ' || strftime('%d/%m/%Y', date))) VIRTUAL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_e1588fa548"
+FOREIGN KEY ("location_id")
+  REFERENCES "locations" ("id")
+);
+CREATE INDEX "index_jobs_on_location_id" ON "jobs" ("location_id") /*application='Fa'*/;
+CREATE INDEX "index_jobs_on_date" ON "jobs" ("date") /*application='Fa'*/;
+CREATE INDEX "index_jobs_on_with_video" ON "jobs" ("with_video") /*application='Fa'*/;
+CREATE VIRTUAL TABLE jobs_fts USING fts5 (description, notes, legacy_data, content='jobs', content_rowid='id')
+/* jobs_fts(description,notes,legacy_data) */;
+CREATE TABLE IF NOT EXISTS 'jobs_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'jobs_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'jobs_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'jobs_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
+CREATE TRIGGER jobs_ai AFTER INSERT ON jobs BEGIN
+        INSERT INTO jobs_fts(rowid, description, notes, legacy_data)
+        VALUES (new.id, new.description, new.notes, new.legacy_data);
+      END;
+CREATE TRIGGER jobs_ad AFTER DELETE ON jobs BEGIN
+        INSERT INTO jobs_fts(jobs_fts, rowid, description, notes, legacy_data)
+        VALUES('delete', old.id, old.description, old.notes, old.legacy_data);
+      END;
+CREATE TRIGGER jobs_au AFTER UPDATE ON jobs BEGIN
+        INSERT INTO jobs_fts(jobs_fts, rowid, description, notes, legacy_data)
+        VALUES('delete', old.id, old.description, old.notes, old.legacy_data);
+
+        INSERT INTO jobs_fts(rowid, description, notes, legacy_data)
+        VALUES (new.id, new.description, new.notes, new.legacy_data);
+      END;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260228182212'),
+('20260228182023'),
 ('20260228175407'),
 ('20260228174741'),
 ('20260228164800'),
