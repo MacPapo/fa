@@ -75,7 +75,27 @@ CREATE TRIGGER jobs_au AFTER UPDATE ON jobs BEGIN
         INSERT INTO jobs_fts(rowid, description, notes, legacy_data)
         VALUES (new.id, new.description, new.notes, new.legacy_data);
       END;
+CREATE TABLE IF NOT EXISTS "participations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "job_id" integer NOT NULL, "contact_id" integer NOT NULL, "role" varchar NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_3c57aa2e63"
+FOREIGN KEY ("job_id")
+  REFERENCES "jobs" ("id")
+, CONSTRAINT "fk_rails_fb5eac5bc1"
+FOREIGN KEY ("contact_id")
+  REFERENCES "contacts" ("id")
+);
+CREATE INDEX "index_participations_on_job_id" ON "participations" ("job_id") /*application='Fa'*/;
+CREATE INDEX "index_participations_on_contact_id" ON "participations" ("contact_id") /*application='Fa'*/;
+CREATE UNIQUE INDEX "idx_participations_unique_role" ON "participations" ("job_id", "contact_id", "role") /*application='Fa'*/;
+CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "nickname" varchar NOT NULL, "password_digest" varchar NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE UNIQUE INDEX "index_users_on_nickname" ON "users" ("nickname") /*application='Fa'*/;
+CREATE TABLE IF NOT EXISTS "sessions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "ip_address" varchar, "user_agent" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_758836b4f0"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_sessions_on_user_id" ON "sessions" ("user_id") /*application='Fa'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260228234330'),
+('20260228234329'),
+('20260228183359'),
 ('20260228182212'),
 ('20260228182023'),
 ('20260228175407'),
