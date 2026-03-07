@@ -1,0 +1,17 @@
+<ul class="menu bg-base-100 rounded-box shadow mt-1 w-full border border-base-300">
+  <% contacts.each do |contact| %>
+    <li>
+      <button type="button" data-action="click->multi-autocomplete#select" data-id="<%= contact.id %>" data-name="<%= contact.display_name %>">
+        <div class="flex flex-col items-start"><span class="font-bold"><%= contact.display_name %></span></div>
+      </button>
+    </li>
+  <% end %>
+  <% if contacts.any? %><div class="divider my-0"></div><% end %>
+  <% if params[:query].present? %>
+    <li>
+      <button type="button" class="text-primary font-bold" data-action="click->multi-autocomplete#openModal" data-query="<%= params[:query] %>" data-modal-id="new_subject_modal" data-input-id="modal_subject_name">
+        + Nuovo Soggetto: "<%= params[:query] %>"
+      </button>
+    </li>
+  <% end %>
+</ul>

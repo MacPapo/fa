@@ -1,22 +1,35 @@
 Rails.application.routes.draw do
   resource :session
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  namespace :locations do
+  concern :searchable do
     resources :searches, only: [ :index ]
   end
 
   resources :jobs
-  resources :locations
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # 1. Rotte standard (per i modali di creazione)
+  resources :locations, only: [ :create ]
+  resources :photographers, only: [ :create ]
+  resources :clients, only: [ :create ]
+  resources :subjects, only: [ :create ]
+
+  # 2. Namespace per le ricerche (Autocomplete)
+  namespace :locations do
+    concerns :searchable
+  end
+
+  namespace :photographers do
+    concerns :searchable
+  end
+
+  namespace :clients do
+    concerns :searchable
+  end
+
+  namespace :subjects do
+    concerns :searchable
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
   root "jobs#index"
 end

@@ -1,0 +1,36 @@
+<%#
+  Variabili locali opzionali:
+  - return_to (String): URL a cui fare il morphing/redirect
+  - modal_id (String): L'ID del modale per chiuderlo (es. "new_location_modal")
+  - input_id (String): L'ID del campo nome per l'autocomplete Stimulus
+%>
+
+<%= form_with(model: location, class: "flex flex-col gap-4") do |f| %>
+
+  <%# Se siamo in un flusso di morphing, iniettiamo da dove veniamo %>
+  <% if local_assigns[:return_to] %>
+    <%= hidden_field_tag :return_to, return_to %>
+  <% end %>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Nome</legend>
+    <%# Usiamo input_id se passato, altrimenti Rails genera il suo standard %>
+    <%= f.text_field :name, id: local_assigns[:input_id], class: "input w-full", required: true %>
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Sestiere / Zona</legend>
+    <%= f.text_field :district, class: "input w-full", placeholder: "Es: Dorsoduro..." %>
+  </fieldset>
+
+  <%# Gestione dinamica dei bottoni: Modale vs Pagina Normale %>
+  <div class="<%= local_assigns[:modal_id] ? 'modal-action' : 'mt-4' %>">
+    <% if local_assigns[:modal_id] %>
+      <button type="button" class="btn" onclick="<%= modal_id %>.close()">Annulla</button>
+      <%= f.submit "Salva e Usa", class: "btn btn-primary" %>
+    <% else %>
+      <%= link_to "Annulla", locations_path, class: "btn" %>
+      <%= f.submit "Salva", class: "btn btn-primary" %>
+    <% end %>
+  </div>
+<% end %>

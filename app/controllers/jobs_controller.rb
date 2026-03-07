@@ -65,8 +65,18 @@ class JobsController < ApplicationController
 
     def assign_morph_params
       @job.location_id = params[:new_location_id] if params[:new_location_id].present?
-      @job.photographer_id = params[:new_photographer_id] if params[:new_photographer_id].present?
-      @job.client_id = params[:new_client_id] if params[:new_client_id].present?
+
+      if params[:new_photographer_id].present?
+        @job.photographer_ids = (@job.photographer_ids + [ params[:new_photographer_id].to_i ]).uniq
+      end
+
+      if params[:new_client_id].present?
+        @job.client_ids = (@job.client_ids + [ params[:new_client_id].to_i ]).uniq
+      end
+
+      if params[:new_subject_id].present?
+        @job.subject_ids = (@job.subject_ids + [ params[:new_subject_id].to_i ]).uniq
+      end
     end
 
     def job_params
@@ -74,7 +84,12 @@ class JobsController < ApplicationController
         :date, :start_at, :end_at, :description, :notes, :with_video, :location_id,
 
         # legacy
-        :from_time, :to_time, :legacy_location
+        :from_time, :to_time, :legacy_location,
+
+        # contacts
+        photographer_ids: [],
+        client_ids: [],
+        subject_ids: []
       )
     end
 end

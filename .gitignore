@@ -39,4 +39,4 @@
 db/locations/
 db/legacy_data/
 lib/tasks/import_legacy.rake
-lib/tasks/populate_locations.rake
+lib/tasks/import_locations.rake

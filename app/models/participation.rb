@@ -2,7 +2,7 @@ class Participation < ApplicationRecord
   ROLES = {
     photographer: "Fotografo",
     client: "Cliente",
-    character: "Soggetto"
+    subject: "Soggetto"
   }.freeze
 
   belongs_to :job

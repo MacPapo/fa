@@ -1,0 +1,52 @@
+<%= form_with(model: contact, url: url, class: "flex flex-col gap-4") do |f| %>
+  <% if local_assigns[:return_to] %>
+    <%= hidden_field_tag :return_to, return_to %>
+  <% end %>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Tipo di Cliente</legend>
+    <div class="flex gap-4">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.radio_button :kind, 'company', checked: contact.company? || contact.kind.nil?, class: "radio" %>
+        <span>Azienda</span>
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.radio_button :kind, 'person', checked: contact.person?, class: "radio" %>
+        <span>Privato</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Ragione Sociale (se Azienda)</legend>
+    <%= f.text_field :company_name, id: local_assigns[:input_id], class: "input w-full" %>
+  </fieldset>
+
+  <div class="flex gap-4 w-full">
+    <fieldset class="fieldset w-1/2">
+      <legend class="fieldset-legend">Nome</legend>
+      <%= f.text_field :first_name, class: "input w-full" %>
+    </fieldset>
+    <fieldset class="fieldset w-1/2">
+      <legend class="fieldset-legend">Cognome</legend>
+      <%= f.text_field :last_name, class: "input w-full" %>
+    </fieldset>
+  </div>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Partita IVA / Codice Fiscale</legend>
+    <%= f.text_field :vat_number, class: "input w-full" %>
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Email</legend>
+    <%= f.email_field :email, class: "input w-full" %>
+  </fieldset>
+
+  <div class="<%= local_assigns[:modal_id] ? 'modal-action' : 'mt-4' %>">
+    <% if local_assigns[:modal_id] %>
+      <button type="button" class="btn" onclick="<%= modal_id %>.close()">Annulla</button>
+    <% end %>
+    <%= f.submit "Salva e Usa", class: "btn btn-primary" %>
+  </div>
+<% end %>

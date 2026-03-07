@@ -24,7 +24,7 @@ CREATE TRIGGER locations_au AFTER UPDATE ON locations BEGIN
         INSERT INTO locations_fts(rowid, name, district)
         VALUES (new.id, new.name, new.district);
       END;
-CREATE TABLE IF NOT EXISTS "contacts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "kind" integer DEFAULT 0 NOT NULL, "first_name" varchar, "last_name" varchar, "known_as" varchar, "company_name" varchar, "vat_number" varchar, "sdi_code" varchar, "tax_id" varchar, "email" varchar, "phone" varchar, "notes" text, "display_name" varchar GENERATED ALWAYS AS (CASE WHEN kind = 1 THEN COALESCE(company_name, '') ELSE TRIM(COALESCE(first_name, '') || ' ' || COALESCE(last_name, '') || CASE WHEN known_as IS NOT NULL AND known_as != '' THEN ' (' || known_as || ')' ELSE '' END) END) VIRTUAL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE TABLE IF NOT EXISTS "contacts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "kind" integer DEFAULT 0 NOT NULL, "first_name" varchar, "last_name" varchar, "known_as" varchar, "company_name" varchar, "vat_number" varchar, "sdi_code" varchar, "tax_id" varchar, "email" varchar, "phone" varchar, "notes" text, "display_name" varchar GENERATED ALWAYS AS (TRIM(COALESCE(NULLIF(TRIM(CASE WHEN kind = 1 THEN company_name ELSE '' END), ''), NULLIF(TRIM(COALESCE(first_name, '') || ' ' || COALESCE(last_name, '')), ''), '') || CASE WHEN known_as IS NOT NULL AND known_as != '' THEN ' (' || known_as || ')' ELSE '' END)) VIRTUAL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_contacts_on_email" ON "contacts" ("email") WHERE email IS NOT NULL AND email != '' /*application='Fa'*/;
 CREATE UNIQUE INDEX "index_contacts_on_tax_id" ON "contacts" ("tax_id") WHERE tax_id IS NOT NULL AND tax_id != '' /*application='Fa'*/;
 CREATE UNIQUE INDEX "index_contacts_on_vat_number" ON "contacts" ("vat_number") WHERE vat_number IS NOT NULL AND vat_number != '' /*application='Fa'*/;
@@ -77,7 +77,7 @@ CREATE TRIGGER jobs_au AFTER UPDATE ON jobs BEGIN
         INSERT INTO jobs_fts(rowid, description, notes, legacy_data)
         VALUES (new.id, new.description, new.notes, new.legacy_data);
       END;
-CREATE TABLE IF NOT EXISTS "participations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "job_id" integer NOT NULL, "contact_id" integer NOT NULL, "role" varchar NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_3c57aa2e63"
+CREATE TABLE IF NOT EXISTS "participations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "job_id" integer NOT NULL, "contact_id" integer NOT NULL, "title" varchar, "role" varchar NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_3c57aa2e63"
 FOREIGN KEY ("job_id")
   REFERENCES "jobs" ("id")
 , CONSTRAINT "fk_rails_fb5eac5bc1"
@@ -94,7 +94,29 @@ FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
 );
 CREATE INDEX "index_sessions_on_user_id" ON "sessions" ("user_id") /*application='Fa'*/;
+CREATE VIRTUAL TABLE participations_fts USING fts5 (title, role, content='participations', content_rowid='id')
+/* participations_fts(title,role) */;
+CREATE TABLE IF NOT EXISTS 'participations_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'participations_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'participations_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'participations_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
+CREATE TRIGGER participations_ai AFTER INSERT ON participations BEGIN
+        INSERT INTO participations_fts(rowid, title, role)
+        VALUES (new.id, new.title, new.role);
+      END;
+CREATE TRIGGER participations_ad AFTER DELETE ON participations BEGIN
+        INSERT INTO participations_fts(participations_fts, rowid, title, role)
+        VALUES('delete', old.id, old.title, old.role);
+      END;
+CREATE TRIGGER participations_au AFTER UPDATE ON participations BEGIN
+        INSERT INTO participations_fts(participations_fts, rowid, title, role)
+        VALUES('delete', old.id, old.title, old.role);
+
+        INSERT INTO participations_fts(rowid, title, role)
+        VALUES (new.id, new.title, new.role);
+      END;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260306183944'),
 ('20260228234330'),
 ('20260228234329'),
 ('20260228183359'),

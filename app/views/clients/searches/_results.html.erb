@@ -1,0 +1,20 @@
+<ul class="menu bg-base-100 rounded-box shadow mt-1 w-full border border-base-300">
+  <% contacts.each do |contact| %>
+    <li>
+      <button type="button" data-action="click->multi-autocomplete#select" data-id="<%= contact.id %>" data-name="<%= contact.display_name %>">
+        <div class="flex flex-col items-start">
+          <span class="font-bold"><%= contact.display_name %></span>
+          <span class="opacity-50 text-xs"><%= [contact.vat_number, contact.email].compact_blank.join(" • ") %></span>
+        </div>
+      </button>
+    </li>
+  <% end %>
+  <% if contacts.any? %><div class="divider my-0"></div><% end %>
+  <% if params[:query].present? %>
+    <li>
+      <button type="button" class="text-primary font-bold" data-action="click->multi-autocomplete#openModal" data-query="<%= params[:query] %>" data-modal-id="new_client_modal" data-input-id="modal_client_name">
+        + Nuovo Cliente: "<%= params[:query] %>"
+      </button>
+    </li>
+  <% end %>
+</ul>

@@ -22,7 +22,7 @@ class CreateContacts < ActiveRecord::Migration[8.1]
 
       t.virtual :display_name,
                 type: :string,
-                as: "CASE WHEN kind = 1 THEN COALESCE(company_name, '') ELSE TRIM(COALESCE(first_name, '') || ' ' || COALESCE(last_name, '') || CASE WHEN known_as IS NOT NULL AND known_as != '' THEN ' (' || known_as || ')' ELSE '' END) END",
+                as: "TRIM(COALESCE(NULLIF(TRIM(CASE WHEN kind = 1 THEN company_name ELSE '' END), ''), NULLIF(TRIM(COALESCE(first_name, '') || ' ' || COALESCE(last_name, '')), ''), '') || CASE WHEN known_as IS NOT NULL AND known_as != '' THEN ' (' || known_as || ')' ELSE '' END)",
                 stored: false
 
       t.timestamps

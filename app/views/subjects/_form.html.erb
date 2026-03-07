@@ -1,0 +1,24 @@
+<%= form_with(model: contact, url: url, class: "flex flex-col gap-4") do |f| %>
+  <% if local_assigns[:return_to] %>
+    <%= hidden_field_tag :return_to, return_to %>
+  <% end %>
+
+  <%= f.hidden_field :kind, value: "person" %>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Nome</legend>
+    <%= f.text_field :first_name, id: local_assigns[:input_id], class: "input w-full", required: true %>
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Cognome</legend>
+    <%= f.text_field :last_name, class: "input w-full", required: true %>
+  </fieldset>
+
+  <div class="<%= local_assigns[:modal_id] ? 'modal-action' : 'mt-4' %>">
+    <% if local_assigns[:modal_id] %>
+      <button type="button" class="btn" onclick="<%= modal_id %>.close()">Annulla</button>
+    <% end %>
+    <%= f.submit "Salva e Usa", class: "btn btn-primary" %>
+  </div>
+<% end %>

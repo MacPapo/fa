@@ -50,6 +50,28 @@
 	     search_url: locations_searches_path,
 	     display_value: job.location&.name %>
 
+  <%= render "shared/multi_autocomplete",
+	     form: form,
+	     field: :photographer_ids,
+	     label: "Fotografi Assegnati",
+	     search_url: photographers_searches_path,
+	     selected_items: job.photographers %>
+
+  <%= render "shared/multi_autocomplete",
+             form: form,
+             field: :client_ids,
+             label: "Clienti",
+             search_url: clients_searches_path,
+             selected_items: job.clients %>
+
+  <%= render "shared/multi_autocomplete",
+             form: form,
+             field: :subject_ids,
+             label: "Soggetti (Subjects)",
+             search_url: subjects_searches_path,
+             selected_items: job.subjects %>
+
+
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Location (Legacy)</legend>
@@ -70,4 +92,40 @@
     <%= form.submit "Salva Lavoro", class: "btn btn-primary" %>
   </div>
 
+<% end %>
+
+<%= render layout: "shared/modal", locals: { id: "new_location_modal", title: "Nuova Location" } do %>
+  <%= render "locations/form",
+	     location: Location.new,
+	     return_to: request.fullpath,
+	     modal_id: "new_location_modal",
+             input_id: "modal_location_name" %>
+<% end %>
+
+
+<%= render layout: "shared/modal", locals: { id: "new_photographer_modal", title: "Nuovo Fotografo" } do %>
+  <%= render "photographers/form",
+	     contact: Contact.new(kind: :person),
+	     url: photographers_path,
+             return_to: request.fullpath,
+             modal_id: "new_photographer_modal",
+             input_id: "modal_photographer_name" %>
+<% end %>
+
+<%= render layout: "shared/modal", locals: { id: "new_client_modal", title: "Nuovo Cliente" } do %>
+  <%= render "clients/form",
+             contact: Contact.new(kind: :company),
+             url: clients_path,
+             return_to: request.fullpath,
+             modal_id: "new_client_modal",
+             input_id: "modal_client_name" %>
+<% end %>
+
+<%= render layout: "shared/modal", locals: { id: "new_subject_modal", title: "Nuovo Soggetto" } do %>
+  <%= render "subjects/form",
+             contact: Contact.new(kind: :person),
+             url: subjects_path,
+             return_to: request.fullpath,
+             modal_id: "new_subject_modal",
+             input_id: "modal_subject_name" %>
 <% end %>

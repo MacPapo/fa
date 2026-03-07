@@ -4,6 +4,7 @@ class CreateParticipations < ActiveRecord::Migration[8.1]
       t.references :job, null: false, foreign_key: true
       t.references :contact, null: false, foreign_key: true
 
+      t.string :title
       t.string :role, null: false
 
       t.timestamps
