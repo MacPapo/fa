@@ -1,0 +1,80 @@
+<%= form_with(model: contact, url: local_assigns[:url], class: "flex flex-col gap-4", data: { controller: "contact-form" }) do |form| %>
+
+  <% if local_assigns[:return_to].present? %>
+    <%= hidden_field_tag :return_to, local_assigns[:return_to] %>
+    <%= hidden_field_tag :morph_key, local_assigns[:morph_key] %>
+  <% end %>
+
+  <%# --- Gestione Errori --- %>
+  <% if contact.errors.any? %>
+    <div role="alert" class="alert alert-error">
+      <span><%= pluralize(contact.errors.count, "errore impedisce", "errori impediscono") %> il salvataggio:</span>
+      <ul>
+        <% contact.errors.each do |error| %>
+          <li>- <%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# --- Selezione Tipo (Persona o Azienda) --- %>
+  <div class="flex gap-6 mb-2">
+    <label class="flex items-center gap-2 cursor-pointer">
+      <%= form.radio_button :kind, "person", class: "radio radio-primary", data: { action: "change->contact-form#toggle", contact_form_target: "personRadio" } %>
+      <span class="label-text font-bold">Persona Fisica</span>
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer">
+      <%= form.radio_button :kind, "company", class: "radio radio-primary", data: { action: "change->contact-form#toggle", contact_form_target: "companyRadio" } %>
+      <span class="label-text font-bold">Azienda / Ente</span>
+    </label>
+  </div>
+
+  <%# --- Campi Persona (Nascosti se è Azienda) --- %>
+  <div data-contact-form-target="personFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Nome *</legend>
+      <%= form.text_field :first_name, class: "input w-full" %>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Cognome *</legend>
+      <%= form.text_field :last_name, class: "input w-full" %>
+    </fieldset>
+  </div>
+
+  <%# --- Campi Azienda (Nascosti se è Persona) --- %>
+  <div data-contact-form-target="companyFields" class="hidden">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Ragione Sociale *</legend>
+      <%= form.text_field :company_name, class: "input w-full" %>
+    </fieldset>
+  </div>
+
+  <%# --- Campi Condivisi (Contatti e Fiscalità) --- %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Email</legend>
+      <%= form.email_field :email, class: "input w-full" %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Telefono</legend>
+      <%= form.text_field :phone, class: "input w-full" %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Partita IVA</legend>
+      <%= form.text_field :vat_number, class: "input w-full" %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Codice Fiscale</legend>
+      <%= form.text_field :tax_id, class: "input w-full" %>
+    </fieldset>
+  </div>
+
+  <%# --- Azioni Form --- %>
+  <div class="mt-6">
+    <%= form.submit "Salva Contatto", class: "btn btn-primary w-full sm:w-auto" %>
+  </div>
+
+<% end %>

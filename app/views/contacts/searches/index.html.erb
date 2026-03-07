@@ -1,0 +1,18 @@
+<%= render layout: "layouts/autocomplete_results", locals: { query: params[:query], js_controller: "multi-autocomplete" } do %>
+
+  <% if @contacts.any? %>
+    <% @contacts.each do |contact| %>
+      <li>
+        <a class="cursor-pointer"
+           data-action="click->multi-autocomplete#select"
+           data-id="<%= contact.id %>"
+           data-name="<%= contact.display_name %>">
+          <%= contact.display_name %>
+        </a>
+      </li>
+    <% end %>
+  <% else %>
+    <li class="disabled"><a class="text-base-content/50 italic">Nessun contatto trovato</a></li>
+  <% end %>
+
+<% end %>

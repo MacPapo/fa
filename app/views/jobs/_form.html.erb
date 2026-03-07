@@ -43,35 +43,44 @@
     </label>
   </fieldset>
 
-  <!-- Location -->
   <%= render "shared/autocomplete",
-	     form: form,
-	     field: :location_id,
-	     label: "Location",
-	     search_url: locations_searches_path,
-	     display_value: job.location&.name %>
-
+             form: form,
+             field: :location_id,
+             label: "Location",
+             search_url: locations_searches_path,
+             display_value: job.location&.name,
+             modal_id: "new_location_modal",
+             input_id: "modal_location_name" %>
+  <%# ========================================== %>
+  <%# PARTECIPAZIONI (Tutte puntano a contacts!) %>
+  <%# ========================================== %>
 
   <%= render "shared/participation_builder",
              form: form,
              role: Participation::ROLES[:photographer],
              label: "Fotografi Assegnati",
-             search_url: photographers_searches_path,
-             participations: job.participations.select { |p| p.role == Participation::ROLES[:photographer] } %>
+             search_url: contacts_searches_path,
+             participations: job.participations.select { |p| p.role == Participation::ROLES[:photographer] },
+             modal_id: "new_photographer_modal",
+             input_id: "modal_photographer_name" %>
 
   <%= render "shared/participation_builder",
              form: form,
              role: Participation::ROLES[:client],
              label: "Clienti",
-             search_url: clients_searches_path,
-             participations: job.participations.select { |p| p.role == Participation::ROLES[:client] } %>
+             search_url: contacts_searches_path,
+             participations: job.participations.select { |p| p.role == Participation::ROLES[:client] },
+             modal_id: "new_client_modal",
+             input_id: "modal_client_name" %>
 
   <%= render "shared/participation_builder",
              form: form,
              role: Participation::ROLES[:subject],
-             label: "Soggetti (Subjects)",
-             search_url: subjects_searches_path,
-             participations: job.participations.select { |p| p.role == Participation::ROLES[:subject] } %>
+             label: "Soggetti",
+             search_url: contacts_searches_path,
+             participations: job.participations.select { |p| p.role == Participation::ROLES[:subject] },
+             modal_id: "new_subject_modal",
+             input_id: "modal_subject_name" %>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Location (Legacy)</legend>
@@ -94,38 +103,46 @@
 
 <% end %>
 
+
+<%# ========================================== %>
+<%# MODALI (Tutti renderizzano contacts/form)  %>
+<%# ========================================== %>
+
 <%= render layout: "shared/modal", locals: { id: "new_location_modal", title: "Nuova Location" } do %>
   <%= render "locations/form",
-	     location: Location.new,
-	     return_to: request.fullpath,
-	     modal_id: "new_location_modal",
+             location: Location.new,
+             return_to: request.fullpath,
+             morph_key: "new_location_id",
+             modal_id: "new_location_modal",
              input_id: "modal_location_name" %>
 <% end %>
 
-
 <%= render layout: "shared/modal", locals: { id: "new_photographer_modal", title: "Nuovo Fotografo" } do %>
-  <%= render "photographers/form",
-	     contact: Contact.new(kind: :person),
-	     url: photographers_path,
+  <%= render "contacts/form",
+             contact: Contact.new(kind: :person),
+             url: contacts_path,
              return_to: request.fullpath,
+             morph_key: "new_photographer_id",
              modal_id: "new_photographer_modal",
              input_id: "modal_photographer_name" %>
 <% end %>
 
 <%= render layout: "shared/modal", locals: { id: "new_client_modal", title: "Nuovo Cliente" } do %>
-  <%= render "clients/form",
+  <%= render "contacts/form",
              contact: Contact.new(kind: :company),
-             url: clients_path,
+             url: contacts_path,
              return_to: request.fullpath,
+             morph_key: "new_client_id",
              modal_id: "new_client_modal",
              input_id: "modal_client_name" %>
 <% end %>
 
 <%= render layout: "shared/modal", locals: { id: "new_subject_modal", title: "Nuovo Soggetto" } do %>
-  <%= render "subjects/form",
+  <%= render "contacts/form",
              contact: Contact.new(kind: :person),
-             url: subjects_path,
+             url: contacts_path,
              return_to: request.fullpath,
+             morph_key: "new_subject_id",
              modal_id: "new_subject_modal",
              input_id: "modal_subject_name" %>
 <% end %>

@@ -1,0 +1,18 @@
+<%= render layout: "layouts/autocomplete_results", locals: { query: params[:query], js_controller: "autocomplete" } do %>
+
+  <% if @locations.any? %>
+    <% @locations.each do |location| %>
+      <li>
+        <a class="cursor-pointer"
+           data-action="click->autocomplete#select"
+           data-id="<%= location.id %>"
+           data-name="<%= location.display_name %>">
+          <%= location.display_name %>
+        </a>
+      </li>
+    <% end %>
+  <% else %>
+    <li class="disabled"><a class="text-base-content/50 italic">Nessun luogo trovato</a></li>
+  <% end %>
+
+<% end %>

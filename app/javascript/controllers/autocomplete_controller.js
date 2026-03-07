@@ -2,6 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="autocomplete"
 export default class extends Controller {
+	// input: il campo dove scrivi
+	// hidden: il campo che invia l'ID al server
+	// results: il div a tendina dove iniettiamo l'HTML
 	static targets = ["input", "hidden", "results"]
 	static values = { url: String }
 
@@ -18,6 +21,7 @@ export default class extends Controller {
 			return
 		}
 
+		// Debounce: aspetta 300ms prima di chiamare il server per non intasarlo
 		this.timeout = setTimeout(() => {
 			fetch(`${this.urlValue}?query=${encodeURIComponent(query)}`)
 				.then(response => response.text())
@@ -30,28 +34,31 @@ export default class extends Controller {
 	select(event) {
 		event.preventDefault()
 
-		// Popola i campi con i data-attribute del bottone cliccato
+		// 1. Popola i campi
 		this.hiddenTarget.value = event.currentTarget.dataset.id
 		this.inputTarget.value = event.currentTarget.dataset.name
 
-		// Nasconde i risultati
+		// 2. Chiudi la tendina
 		this.resultsTarget.innerHTML = ""
 	}
 
 	openModal(event) {
 		event.preventDefault()
 
-		const query = event.currentTarget.dataset.query
-		const modalId = event.currentTarget.dataset.modalId
-		const inputId = event.currentTarget.dataset.inputId
+		// Legge l'ID del modale direttamente dal fieldset genitore
+		const modalId = this.element.dataset.modalId
+		const inputId = this.element.dataset.inputId
+		const currentQuery = this.inputTarget.value
 
 		const modal = document.getElementById(modalId)
 		const nameInput = document.getElementById(inputId)
 
-		if (modal && nameInput) {
-			nameInput.value = query
+		if (modal) {
+			if (nameInput) nameInput.value = currentQuery
 			modal.showModal()
 			this.resultsTarget.innerHTML = ""
+		} else {
+			console.error("Modale non trovato:", modalId)
 		}
 	}
 }

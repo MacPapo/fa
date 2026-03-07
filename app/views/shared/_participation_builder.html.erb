@@ -1,7 +1,7 @@
-<%# app/views/shared/_participation_builder.html.erb %>
-<fieldset class="fieldset" data-controller="multi-autocomplete" data-multi-autocomplete-url-value="<%= search_url %>" data-multi-autocomplete-role-value="<%= role %>">
+<fieldset class="fieldset" data-controller="multi-autocomplete" data-multi-autocomplete-url-value="<%= search_url %>" data-modal-id="<%= local_assigns[:modal_id] %>" data-input-id="<%= local_assigns[:input_id] %>">
   <legend class="fieldset-legend"><%= label %></legend>
 
+  <%# CONTENITORE DELLE RIGHE SELEZIONATE %>
   <div data-multi-autocomplete-target="selectedContainer" class="flex flex-col gap-2 mb-4">
     <%= form.fields_for :participations, participations do |p_form| %>
       <div class="flex items-center gap-2 p-2 bg-base-200 rounded-box border border-base-300 participation-row">
@@ -9,19 +9,16 @@
         <%= p_form.hidden_field :role, value: role %>
         <%= p_form.hidden_field :_destroy, class: "destroy-flag" %>
 
-        <div class="font-bold flex-1 truncate">
-          <%= p_form.object.contact.display_name %>
-        </div>
-
+        <div class="font-bold flex-1 truncate"><%= p_form.object.contact.display_name %></div>
         <div class="flex-1">
-          <%= p_form.text_field :title, class: "input input-sm w-full", placeholder: "Veste/Titolo (es. Sindaco)" %>
+          <%= p_form.text_field :title, class: "input input-sm w-full", placeholder: "Veste/Titolo" %>
         </div>
-
         <button type="button" data-action="click->multi-autocomplete#removeRow" class="btn btn-sm btn-ghost text-error">X</button>
       </div>
     <% end %>
   </div>
 
+  <%# INPUT DI RICERCA %>
   <div class="dropdown w-full">
     <input type="text"
            class="input w-full"
@@ -32,20 +29,17 @@
     <div data-multi-autocomplete-target="results" class="dropdown-content w-full z-[1]"></div>
   </div>
 
+  <%# IL TEMPLATE MAGICO (Invisibile, clonato dal JS) %>
   <template data-multi-autocomplete-target="badgeTemplate">
     <div class="flex items-center gap-2 p-2 bg-base-200 rounded-box border border-base-300 participation-row">
       <input type="hidden" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][contact_id]" value="TEMPLATE_ID">
       <input type="hidden" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][role]" value="<%= role %>">
       <input type="hidden" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][_destroy]" value="0" class="destroy-flag">
 
-      <div class="font-bold flex-1 truncate">
-        TEMPLATE_NAME
-      </div>
-
+      <div class="font-bold flex-1 truncate">TEMPLATE_NAME</div>
       <div class="flex-1">
-        <input type="text" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][title]" class="input input-sm w-full" placeholder="Veste/Titolo (es. Sindaco)">
+        <input type="text" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][title]" class="input input-sm w-full" placeholder="Veste/Titolo">
       </div>
-
       <button type="button" data-action="click->multi-autocomplete#removeRow" class="btn btn-sm btn-ghost text-error">X</button>
     </div>
   </template>

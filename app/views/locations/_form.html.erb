@@ -1,15 +1,8 @@
-<%#
-  Variabili locali opzionali:
-  - return_to (String): URL a cui fare il morphing/redirect
-  - modal_id (String): L'ID del modale per chiuderlo (es. "new_location_modal")
-  - input_id (String): L'ID del campo nome per l'autocomplete Stimulus
-%>
-
 <%= form_with(model: location, class: "flex flex-col gap-4") do |f| %>
 
-  <%# Se siamo in un flusso di morphing, iniettiamo da dove veniamo %>
-  <% if local_assigns[:return_to] %>
-    <%= hidden_field_tag :return_to, return_to %>
+  <% if local_assigns[:return_to].present? %>
+    <%= hidden_field_tag :return_to, local_assigns[:return_to] %>
+    <%= hidden_field_tag :morph_key, local_assigns[:morph_key] %>
   <% end %>
 
   <fieldset class="fieldset">

@@ -1,32 +1,56 @@
 class LocationsController < ApplicationController
+  before_action :set_location, only: %i[ show edit update destroy ]
+
+  def index
+    @locations = Location.order(:name)
+  end
+
+  def show
+    # Carichiamo i lavori associati a questa location
+    @jobs = Job.where(location_id: @location.id).order(date: :desc)
+  end
+
+  def new
+    @location = Location.new
+  end
+
   def create
     @location = Location.new(location_params)
 
     if @location.save
-      # Se ci è stato passato un return_to (es. /jobs/1/edit), ci accodiamo l'ID della nuova location.
-      # Il redirect in Turbo 8 scatenerà un MORPH della pagina.
-      if params[:return_to].present?
-        redirect_to build_return_url(params[:return_to], @location.id)
+      if params[:return_to].present? && params[:morph_key].present?
+        # Il redirect magico per Turbo 8!
+        redirect_to build_morph_url(params[:return_to], params[:morph_key], @location.id)
       else
         redirect_to locations_path, notice: "Location creata."
       end
     else
-      # Gestione errori standard
-      redirect_to params[:return_to], alert: "Errore nella creazione della location."
+      render :new, status: :unprocessable_entity
     end
   end
 
+  def edit
+  end
+
+  def update
+    if @location.update(location_params)
+      redirect_to @location, notice: "Location aggiornata."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @location.destroy
+    redirect_to locations_path, notice: "Location eliminata.", status: :see_other
+  end
+
   private
-    def location_params
-      params.require(:location).permit(:name, :district)
+    def set_location
+      @location = Location.find(params[:id])
     end
 
-    # Helper per aggiungere ?new_location_id=123 all'URL di ritorno
-    def build_return_url(url, location_id)
-      uri = URI.parse(url)
-      query = Rack::Utils.parse_query(uri.query)
-      query["new_location_id"] = location_id
-      uri.query = Rack::Utils.build_query(query)
-      uri.to_s
+    def location_params
+      params.require(:location).permit(:name, :address, :city, :zip) # Aggiungi i campi reali del tuo DB
     end
 end

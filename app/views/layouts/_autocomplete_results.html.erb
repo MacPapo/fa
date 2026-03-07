@@ -1,0 +1,15 @@
+<%# Parametri attesi: query (la stringa cercata), js_controller (il nome del controller stimulus) %>
+<ul tabindex="0" class="menu bg-base-100 shadow rounded-box w-full">
+
+  <%= yield %>
+
+  <% if local_assigns[:query].present? %>
+    <li class="mt-1 border-t border-base-200">
+      <a class="cursor-pointer text-primary font-bold"
+         data-action="click-><%= js_controller %>#openModal"
+         data-query="<%= query %>">
+        ➕ Crea "<%= query %>"...
+      </a>
+    </li>
+  <% end %>
+</ul>
