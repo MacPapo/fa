@@ -1,8 +1,18 @@
-<%= form_with(model: contact, url: local_assigns[:url], class: "flex flex-col gap-4", data: { controller: "contact-form" }) do |form| %>
+<%= form_with(
+  model: contact,
+  url: local_assigns[:url],
+  id: "#{local_assigns[:modal_id]}_form",
+  class: "flex flex-col gap-4",
+  data: {
+    controller: "contact-form modal-form",
+    action: "turbo:submit-end->modal-form#handleSuccess"
+  }
+) do |form| %>
 
-  <% if local_assigns[:return_to].present? %>
-    <%= hidden_field_tag :return_to, local_assigns[:return_to] %>
-    <%= hidden_field_tag :morph_key, local_assigns[:morph_key] %>
+  <% if local_assigns[:modal_id].present? %>
+    <%= hidden_field_tag :modal_id, local_assigns[:modal_id] %>
+    <%= hidden_field_tag :target_list_id, local_assigns[:target_list_id] %>
+    <%= hidden_field_tag :role, local_assigns[:role] %>
   <% end %>
 
   <%# --- Gestione Errori --- %>

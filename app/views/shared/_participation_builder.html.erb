@@ -1,8 +1,8 @@
 <fieldset class="fieldset" data-controller="multi-autocomplete" data-multi-autocomplete-url-value="<%= search_url %>" data-modal-id="<%= local_assigns[:modal_id] %>" data-input-id="<%= local_assigns[:input_id] %>">
   <legend class="fieldset-legend"><%= label %></legend>
 
-  <%# CONTENITORE DELLE RIGHE SELEZIONATE %>
-  <div data-multi-autocomplete-target="selectedContainer" class="flex flex-col gap-2 mb-4">
+  <div id="<%= local_assigns[:target_list_id] %>" data-multi-autocomplete-target="selectedContainer" class="flex flex-col gap-2 mb-4">
+
     <%= form.fields_for :participations, participations do |p_form| %>
       <div class="flex items-center gap-2 p-2 bg-base-200 rounded-box border border-base-300 participation-row">
         <%= p_form.hidden_field :contact_id %>
@@ -29,12 +29,12 @@
     <div data-multi-autocomplete-target="results" class="dropdown-content w-full z-[1]"></div>
   </div>
 
-  <%# IL TEMPLATE MAGICO (Invisibile, clonato dal JS) %>
   <template data-multi-autocomplete-target="badgeTemplate">
     <div class="flex items-center gap-2 p-2 bg-base-200 rounded-box border border-base-300 participation-row">
       <input type="hidden" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][contact_id]" value="TEMPLATE_ID">
       <input type="hidden" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][role]" value="<%= role %>">
-      <input type="hidden" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][_destroy]" value="0" class="destroy-flag">
+
+      <input type="hidden" name="<%= form.object_name %>[participations_attributes][NEW_RECORD][_destroy]" value="0">
 
       <div class="font-bold flex-1 truncate">TEMPLATE_NAME</div>
       <div class="flex-1">

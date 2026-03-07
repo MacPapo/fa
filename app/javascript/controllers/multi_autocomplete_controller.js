@@ -9,6 +9,18 @@ export default class extends Controller {
 
 	connect() {
 		this.timeout = null
+		this.handleModalSuccess = this.handleModalSuccess.bind(this)
+		window.addEventListener("modal:success", this.handleModalSuccess)
+	}
+
+	disconnect() {
+		window.removeEventListener("modal:success", this.handleModalSuccess)
+	}
+
+	handleModalSuccess(event) {
+		if (event.detail.modalId === this.element.dataset.modalId) {
+			this.inputTarget.value = "" // ...Svuotala!
+		}
 	}
 
 	search() {
@@ -55,15 +67,15 @@ export default class extends Controller {
 	removeRow(event) {
 		event.preventDefault()
 
-		const row = event.currentTarget.closest('.participation-row')
+		const row = event.currentTarget.closest('.participation-row') || event.currentTarget.closest('.badge')
+		if (!row) return
+
 		const destroyFlag = row.querySelector('.destroy-flag')
 
 		if (destroyFlag) {
-			// Se il record esiste già nel database, diciamo a Rails di distruggerlo (_destroy = 1) e lo nascondiamo visivamente
 			destroyFlag.value = "1"
 			row.style.display = 'none'
 		} else {
-			// Se è un record che avevamo appena aggiunto per sbaglio, lo eliminiamo del tutto dal DOM
 			row.remove()
 		}
 	}

@@ -1,0 +1,17 @@
+<% if params[:wrapper_id].present? %>
+  <%= turbo_stream.replace params[:wrapper_id] do %>
+    <div id="<%= params[:wrapper_id] %>" class="dropdown w-full">
+      <input type="hidden" name="<%= params[:field_name] %>" value="<%= @location.id %>" data-autocomplete-target="hidden">
+
+      <input type="text"
+             class="input w-full"
+             value="<%= @location.name %>"
+             data-action="input->autocomplete#search"
+             data-autocomplete-target="input"
+             autocomplete="off"
+             placeholder="Cerca o digita per creare...">
+
+      <div data-autocomplete-target="results" class="dropdown-content w-full z-[1]"></div>
+    </div>
+  <% end %>
+<% end %>

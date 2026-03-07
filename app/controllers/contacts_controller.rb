@@ -27,17 +27,15 @@ class ContactsController < ApplicationController
     @contact = Contact.new(contact_params)
 
     if @contact.save
-      if params[:return_to].present? && params[:morph_key].present?
-        redirect_to build_morph_url(params[:return_to], params[:morph_key], @contact.id)
-      else
-        redirect_to @contact, notice: "Contatto aggiunto alla rubrica."
+      respond_to do |format|
+        if params[:modal_id].present?
+          format.turbo_stream
+        else
+          format.html { redirect_to @contact, notice: "Contatto aggiunto alla rubrica." }
+        end
       end
     else
-      if params[:return_to].present?
-        render :new, status: :unprocessable_entity
-      else
-        render :new, status: :unprocessable_entity
-      end
+      render :new, status: :unprocessable_entity
     end
   end
 

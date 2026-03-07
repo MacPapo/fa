@@ -30,12 +30,10 @@ class JobsController < ApplicationController
   # GET /jobs/new
   def new
     @job = Job.new
-    assign_morph_params
   end
 
   # GET /jobs/1/edit
   def edit
-    assign_morph_params
   end
 
   # POST /jobs
@@ -69,42 +67,10 @@ class JobsController < ApplicationController
       @job = Job.includes(:location, participations: :contact).find(params[:id])
     end
 
-    def assign_morph_params
-      @job.location_id = params[:new_location_id] if params[:new_location_id].present?
-
-      if params[:new_photographer_id].present?
-        contact_id = params[:new_photographer_id].to_i
-        unless @job.participations.any? { |p| p.role == Participation::ROLES[:photographer] && p.contact_id == contact_id }
-          @job.participations.build(role: Participation::ROLES[:photographer], contact_id: contact_id)
-        end
-      end
-
-      if params[:new_client_id].present?
-        contact_id = params[:new_client_id].to_i
-        unless @job.participations.any? { |p| p.role == Participation::ROLES[:client] && p.contact_id == contact_id }
-          @job.participations.build(role: Participation::ROLES[:client], contact_id: contact_id)
-        end
-      end
-
-      if params[:new_subject_id].present?
-        contact_id = params[:new_subject_id].to_i
-        unless @job.participations.any? { |p| p.role == Participation::ROLES[:subject] && p.contact_id == contact_id }
-          @job.participations.build(role: Participation::ROLES[:subject], contact_id: contact_id)
-        end
-      end
-    end
-
     def job_params
       params.require(:job).permit(
-        :date, :start_at, :end_at, :description, :notes, :with_video, :location_id,
-
-        # legacy
-        :from_time, :to_time, :legacy_location,
-
-        # contacts
-        # photographer_ids: [],
-        # client_ids: [],
-        # subject_ids: []
+        :description, :notes, :date, :start_at, :end_at, :with_video,
+        :location_id, :legacy_location, :from_time, :to_time,
         participations_attributes: [ :id, :contact_id, :role, :title, :_destroy ]
       )
     end

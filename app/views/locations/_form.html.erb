@@ -1,8 +1,9 @@
-<%= form_with(model: location, class: "flex flex-col gap-4") do |f| %>
+<%= form_with(model: location, class: "flex flex-col gap-4", data: { controller: "modal-form", action: "turbo:submit-end->modal-form#handleSuccess" }) do |f| %>
 
-  <% if local_assigns[:return_to].present? %>
-    <%= hidden_field_tag :return_to, local_assigns[:return_to] %>
-    <%= hidden_field_tag :morph_key, local_assigns[:morph_key] %>
+  <% if local_assigns[:modal_id].present? %>
+    <%= hidden_field_tag :modal_id, local_assigns[:modal_id] %>
+    <%= hidden_field_tag :wrapper_id, local_assigns[:wrapper_id] %>
+    <%= hidden_field_tag :field_name, local_assigns[:field_name] %>
   <% end %>
 
   <fieldset class="fieldset">

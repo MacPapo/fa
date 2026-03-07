@@ -1,7 +1,8 @@
 <fieldset class="fieldset" data-controller="autocomplete" data-autocomplete-url-value="<%= search_url %>" data-modal-id="<%= local_assigns[:modal_id] %>" data-input-id="<%= local_assigns[:input_id] %>">
   <legend class="fieldset-legend"><%= label %></legend>
 
-  <div class="dropdown w-full">
+  <%# Aggiunto l'id dinamico qui sotto %>
+  <div id="<%= local_assigns[:wrapper_id] %>" class="dropdown w-full">
     <%= form.hidden_field field, data: { autocomplete_target: "hidden" } %>
 
     <input type="text"

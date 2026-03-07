@@ -18,11 +18,12 @@ class LocationsController < ApplicationController
     @location = Location.new(location_params)
 
     if @location.save
-      if params[:return_to].present? && params[:morph_key].present?
-        # Il redirect magico per Turbo 8!
-        redirect_to build_morph_url(params[:return_to], params[:morph_key], @location.id)
-      else
-        redirect_to locations_path, notice: "Location creata."
+      respond_to do |format|
+        if params[:modal_id].present?
+          format.turbo_stream
+        else
+          format.html { redirect_to @location, notice: "Location creata." }
+        end
       end
     else
       render :new, status: :unprocessable_entity
