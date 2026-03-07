@@ -3,13 +3,19 @@ class JobsController < ApplicationController
 
   # GET /jobs
   def index
-    base_query = Job.includes(:location)
+    # Precarichiamo sia le location che le partecipazioni con i contatti
+    base_query = Job.includes(:location, participations: :contact)
 
     @jobs = case params[:filter]
     when "future"
               base_query.where("date >= ?", Date.current).order(date: :asc)
     when "unassigned"
-              base_query.where.missing(:photographer_participations).order(date: :desc)
+              # Usiamo un left outer join per trovare i job senza fotografi
+              base_query.left_outer_joins(:participations)
+                .where(participations: { id: nil })
+                .or(base_query.left_outer_joins(:participations).where.not(participations: { role: Participation::ROLES[:photographer] }))
+                .group("jobs.id")
+                .order(date: :desc)
     else
               base_query.recent
     end
@@ -60,22 +66,31 @@ class JobsController < ApplicationController
 
   private
     def set_job
-      @job = Job.find(params[:id])
+      @job = Job.includes(:location, participations: :contact).find(params[:id])
     end
 
     def assign_morph_params
       @job.location_id = params[:new_location_id] if params[:new_location_id].present?
 
       if params[:new_photographer_id].present?
-        @job.photographer_ids = (@job.photographer_ids + [ params[:new_photographer_id].to_i ]).uniq
+        contact_id = params[:new_photographer_id].to_i
+        unless @job.participations.any? { |p| p.role == Participation::ROLES[:photographer] && p.contact_id == contact_id }
+          @job.participations.build(role: Participation::ROLES[:photographer], contact_id: contact_id)
+        end
       end
 
       if params[:new_client_id].present?
-        @job.client_ids = (@job.client_ids + [ params[:new_client_id].to_i ]).uniq
+        contact_id = params[:new_client_id].to_i
+        unless @job.participations.any? { |p| p.role == Participation::ROLES[:client] && p.contact_id == contact_id }
+          @job.participations.build(role: Participation::ROLES[:client], contact_id: contact_id)
+        end
       end
 
       if params[:new_subject_id].present?
-        @job.subject_ids = (@job.subject_ids + [ params[:new_subject_id].to_i ]).uniq
+        contact_id = params[:new_subject_id].to_i
+        unless @job.participations.any? { |p| p.role == Participation::ROLES[:subject] && p.contact_id == contact_id }
+          @job.participations.build(role: Participation::ROLES[:subject], contact_id: contact_id)
+        end
       end
     end
 
@@ -87,9 +102,10 @@ class JobsController < ApplicationController
         :from_time, :to_time, :legacy_location,
 
         # contacts
-        photographer_ids: [],
-        client_ids: [],
-        subject_ids: []
+        # photographer_ids: [],
+        # client_ids: [],
+        # subject_ids: []
+        participations_attributes: [ :id, :contact_id, :role, :title, :_destroy ]
       )
     end
 end

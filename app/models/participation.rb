@@ -1,4 +1,6 @@
 class Participation < ApplicationRecord
+  include FtsSearchable
+
   ROLES = {
     photographer: "Fotografo",
     client: "Cliente",

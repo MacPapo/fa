@@ -1,43 +1,170 @@
 <%= turbo_stream_from "jobs" %>
 
-<div class="flex items-start sm:items-center justify-between gap-4 mb-2">
-  <div>
-    <h1 class="text-3xl font-extrabold tracking-tight text-base-content">Lavori</h1>
-    <p class="text-sm text-base-content/60 mt-1">Gestisci i servizi fotografici e le assegnazioni.</p>
+<div class="max-w-7xl mx-auto pb-12">
+
+  <%# ========================================== %>
+  <%# HEADER E AZIONI RAPIDE                     %>
+  <%# ========================================== %>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-base-content">Lavori</h1>
+      <p class="text-sm text-base-content/60 mt-1">Gestisci i servizi fotografici e le assegnazioni.</p>
+    </div>
+
+    <%= link_to new_job_path, class: "btn btn-primary" do %>
+      <%= icon("add", classes: "w-5 h-5") %>
+      <span class="hidden sm:inline">Nuovo Lavoro</span>
+    <% end %>
+
   </div>
 
-  <%= link_to new_job_path, class: "btn btn-primary" do %>
-    <%= icon("add", classes: "w-5 h-5") %>
-    <span class="hidden sm:inline">Nuovo Lavoro</span>
-  <% end %>
-</div>
 
-<div class="flex flex-wrap items-center gap-2 mb-6">
+  <%# ========================================== %>
+  <%# FILTRI (Tabs Box DaisyUI)                  %>
+  <%# ========================================== %>
+  <div class="tabs tabs-box mb-6 bg-base-100/50 p-1 inline-flex rounded-xl border border-base-200">
 
-  <%= link_to "Tutti", jobs_path,
-  class: "btn btn-sm rounded-full #{params[:filter].blank? ? 'btn-neutral' : 'btn-ghost border border-base-300 hover:border-base-content/30'}" %>
+    <%= link_to "Tutti", jobs_path,
+		class: "tab #{'tab-active font-bold shadow-sm bg-base-100 rounded-lg' if params[:filter].blank?}" %>
 
-  <%= link_to "Futuri", jobs_path(filter: 'future'),
-  class: "btn btn-sm rounded-full #{params[:filter] == 'future' ? 'btn-neutral' : 'btn-ghost border border-base-300 hover:border-base-content/30'}" %>
+    <%= link_to "Futuri", jobs_path(filter: 'future'),
+		class: "tab #{'tab-active font-bold shadow-sm bg-base-100 rounded-lg' if params[:filter] == 'future'}" %>
 
-  <%= link_to jobs_path(filter: 'unassigned'),
-  class: "btn btn-sm rounded-full #{params[:filter] == 'unassigned' ? 'btn-neutral' : 'btn-ghost border border-base-300 hover:border-base-content/30'}" do %>
-    Senza fotografo
-    <% if params[:filter] == 'unassigned' %>
-      <div class="badge badge-xs badge-error"></div>
+    <%= link_to jobs_path(filter: 'unassigned'),
+		class: "tab gap-2 #{'tab-active font-bold shadow-sm bg-base-100 rounded-lg' if params[:filter] == 'unassigned'}" do %>
+      Da assegnare
+      <% if params[:filter] == 'unassigned' %>
+        <span class="badge badge-error badge-xs"></span>
+      <% end %>
     <% end %>
-  <% end %>
 
-</div>
+  </div>
 
-<div class="flex flex-col gap-2" id="jobs_list">
-  <% if @jobs.any? %>
-    <%= render @jobs %>
-    <%== @pagy.series_nav %>
-  <% else %>
-    <div class="py-12 text-center text-base-content/50 bg-base-100 rounded-box border border-base-200 border-dashed">
-      <%= icon("calendar", classes: "w-12 h-12 mx-auto mb-3 opacity-20") %>
-      <p>Nessun lavoro trovato per questo filtro.</p>
-    </div>
-  <% end %>
+
+  <%# ========================================== %>
+  <%# LISTA LAVORI                               %>
+  <%# ========================================== %>
+  <div class="bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden" id="jobs_list">
+
+    <% if @jobs.any? %>
+
+      <ul class="list bg-base-100 rounded-box">
+
+        <%# --- INTESTAZIONE COLONNE (Solo Desktop) --- %>
+        <li class="p-4 pb-2 text-xs opacity-40 tracking-widest hidden md:grid grid-cols-12 gap-4 uppercase font-bold border-b border-base-200">
+          <div class="col-span-2">Data & Ora</div>
+          <div class="col-span-4">Evento</div>
+          <div class="col-span-3">Location</div>
+          <div class="col-span-3">Fotografi</div>
+        </li>
+
+        <%# --- CICLO LAVORI --- %>
+        <% @jobs.each do |job| %>
+
+          <%# Logica Ruby isolata per evitare N+1 %>
+          <% photographers = job.participations.select { |p| p.role == Participation::ROLES[:photographer] } %>
+
+          <li class="list-row items-center border-b border-base-100 hover:bg-base-200/50 transition-colors p-4 group relative">
+
+            <%# Link invisibile che rende tutta la riga cliccabile %>
+            <%= link_to job_path(job), class: "absolute inset-0 z-10" do %><span class="sr-only">Vedi dettagli</span><% end %>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 w-full items-center relative z-0">
+
+              <%# 1. DATA / ORA %>
+              <div class="col-span-1 md:col-span-2">
+                <div class="font-bold text-sm">
+                  <%= job.date.strftime("%d %b %Y") %>
+                </div>
+                <div class="text-xs opacity-60 font-medium">
+                  <% if job.start_at.present? %>
+                    <%= job.start_at.strftime("%H:%M") %>
+                  <% elsif job.legacy_from_time.present? %>
+                    <%= job.legacy_from_time.strftime("%H:%M") %> <span class="opacity-40">(L)</span>
+                  <% else %>
+                    --:--
+                  <% end %>
+                </div>
+              </div>
+
+              <%# 2. EVENTO / TITOLO %>
+              <div class="col-span-1 md:col-span-4 flex items-center gap-2">
+                <div class="font-bold line-clamp-2 leading-tight">
+                  <%= job.display_title %>
+                </div>
+                <% if job.with_video? %>
+                  <span class="badge badge-primary badge-outline badge-sm font-bold ml-2">VIDEO</span>
+                <% end %>
+              </div>
+
+              <%# 3. LOCATION %>
+              <div class="col-span-1 md:col-span-3">
+                <div class="text-sm opacity-80 flex items-center gap-1 line-clamp-1">
+                  <%= job.display_location %>
+                </div>
+              </div>
+
+              <%# 4. FOTOGRAFI (Avatar o Badge) %>
+              <div class="col-span-1 md:col-span-3 flex items-center justify-between">
+
+                <div class="flex -space-x-2">
+                  <% if photographers.any? %>
+
+                    <%# Mostriamo i primi 3 fotografi %>
+                    <% photographers.take(3).each do |p| %>
+                      <div class="avatar placeholder ring ring-base-100 ring-offset-1 ring-offset-base-100 rounded-full">
+                        <div class="bg-neutral text-neutral-content w-8 rounded-full">
+                          <span class="text-xs font-bold"><%= p.contact.display_name.first(2).upcase %></span>
+                        </div>
+                      </div>
+                    <% end %>
+
+                    <%# Se ci sono più di 3 fotografi, mostriamo il contatore +X %>
+                    <% if photographers.size > 3 %>
+                      <div class="avatar placeholder ring ring-base-100 ring-offset-1 ring-offset-base-100 rounded-full">
+                        <div class="bg-base-300 text-base-content w-8 rounded-full">
+                          <span class="text-xs font-bold">+<%= photographers.size - 3 %></span>
+                        </div>
+                      </div>
+                    <% end %>
+
+                  <% else %>
+                    <span class="badge badge-error badge-sm">Da assegnare</span>
+                  <% end %>
+                </div>
+
+                <%# Icona Freccia (visibile solo passando col mouse su desktop) %>
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity text-base-content/30 hidden md:block">
+                  <%= icon("chevron_right", classes: "w-5 h-5") %>
+                </div>
+
+              </div>
+
+            </div>
+          </li>
+        <% end %>
+
+      </ul>
+
+      <%# --- PAGINAZIONE --- %>
+      <div class="p-6 border-t border-base-200 flex justify-center bg-base-100/50">
+        <%== @pagy.series_nav %>
+      </div>
+
+    <% else %>
+
+      <%# --- STATO VUOTO (Se non ci sono lavori) --- %>
+      <div class="py-16 text-center bg-base-100/50">
+        <div class="bg-base-200 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          <%= icon("calendar", classes: "w-8 h-8 opacity-40") %>
+        </div>
+        <h3 class="font-bold text-lg mb-1">Nessun lavoro trovato</h3>
+        <p class="text-sm opacity-60">Non ci sono servizi fotografici per questo filtro.</p>
+      </div>
+
+    <% end %>
+
+  </div>
+
 </div>

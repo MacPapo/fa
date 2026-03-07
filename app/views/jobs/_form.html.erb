@@ -43,6 +43,7 @@
     </label>
   </fieldset>
 
+  <!-- Location -->
   <%= render "shared/autocomplete",
 	     form: form,
 	     field: :location_id,
@@ -50,28 +51,27 @@
 	     search_url: locations_searches_path,
 	     display_value: job.location&.name %>
 
-  <%= render "shared/multi_autocomplete",
-	     form: form,
-	     field: :photographer_ids,
-	     label: "Fotografi Assegnati",
-	     search_url: photographers_searches_path,
-	     selected_items: job.photographers %>
 
-  <%= render "shared/multi_autocomplete",
+  <%= render "shared/participation_builder",
              form: form,
-             field: :client_ids,
+             role: Participation::ROLES[:photographer],
+             label: "Fotografi Assegnati",
+             search_url: photographers_searches_path,
+             participations: job.participations.select { |p| p.role == Participation::ROLES[:photographer] } %>
+
+  <%= render "shared/participation_builder",
+             form: form,
+             role: Participation::ROLES[:client],
              label: "Clienti",
              search_url: clients_searches_path,
-             selected_items: job.clients %>
+             participations: job.participations.select { |p| p.role == Participation::ROLES[:client] } %>
 
-  <%= render "shared/multi_autocomplete",
+  <%= render "shared/participation_builder",
              form: form,
-             field: :subject_ids,
+             role: Participation::ROLES[:subject],
              label: "Soggetti (Subjects)",
              search_url: subjects_searches_path,
-             selected_items: job.subjects %>
-
-
+             participations: job.participations.select { |p| p.role == Participation::ROLES[:subject] } %>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Location (Legacy)</legend>
