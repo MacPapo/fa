@@ -48,25 +48,43 @@ class Job < ApplicationRecord
   def self.global_search(query)
     return all if query.blank?
 
-    # 1. Cerca nei Job (descrizione, note)
-    job_ids = search_text(query).pluck(:id)
+    # 1. Spezziamo la query in termini singoli (rimuovendo spazi extra)
+    terms = query.to_s.strip.split(/\s+/)
 
-    # 2. Cerca nelle Locations (AGGIORNATO: Usa la tabella ponte)
-    loc_ids = Location.search_text(query).select(:id)
-    job_ids_from_loc = joins(:job_locations).where(job_locations: { location_id: loc_ids }).pluck(:id)
+    # Inizializziamo la variabile che conterrà gli ID finali
+    intersected_job_ids = nil
 
-    # 3. Cerca nei Contatti (nome, azienda, p.iva)
-    contact_ids = Contact.search_text(query).select(:id)
-    job_ids_from_contacts = joins(:participations).where(participations: { contact_id: contact_ids }).pluck(:id)
+    # 2. Iteriamo su ogni singola parola della ricerca
+    terms.each do |term|
+      # Troviamo tutti i Job associati a QUESTO termine in tutte le tabelle
+      job_ids = search_text(term).pluck(:id)
 
-    # 4. Cerca nelle Partecipazioni (es. title: "Sindaco")
-    participation_ids = Participation.search_text(query).select(:id)
-    job_ids_from_parts = joins(:participations).where(participations: { id: participation_ids }).pluck(:id)
+      loc_ids = Location.search_text(term).select(:id)
+      job_ids_from_loc = joins(:job_locations).where(job_locations: { location_id: loc_ids }).pluck(:id)
 
-    # Uniamo tutti gli ID trovati e rimuoviamo i duplicati in RAM (veloce)
-    all_matching_job_ids = (job_ids + job_ids_from_loc + job_ids_from_contacts + job_ids_from_parts).uniq
+      contact_ids = Contact.search_text(term).select(:id)
+      job_ids_from_contacts = joins(:participations).where(participations: { contact_id: contact_ids }).pluck(:id)
 
-    # Restituiamo una Relation nativa ordinata per data (dal più recente al più vecchio)
-    where(id: all_matching_job_ids).order(date: :desc)
+      participation_ids = Participation.search_text(term).select(:id)
+      job_ids_from_parts = joins(:participations).where(participations: { id: participation_ids }).pluck(:id)
+
+      # Uniamo tutti gli ID trovati per questo singolo termine
+      term_job_ids = (job_ids + job_ids_from_loc + job_ids_from_contacts + job_ids_from_parts).uniq
+
+      # 3. INTERSEZIONE (AND logico)
+      # Se è il primo giro, salviamo gli ID.
+      # Dai giri successivi, manteniamo solo gli ID che matchano anche il nuovo termine.
+      if intersected_job_ids.nil?
+        intersected_job_ids = term_job_ids
+      else
+        intersected_job_ids = intersected_job_ids & term_job_ids
+      end
+
+      # Ottimizzazione: se a un certo punto l'intersezione è vuota, inutile cercare gli altri termini!
+      break if intersected_job_ids.empty?
+    end
+
+    # 4. Restituiamo la query finale ordinata
+    where(id: intersected_job_ids).order(date: :desc)
   end
 end

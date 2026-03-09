@@ -18,6 +18,8 @@ Rails.application.routes.draw do
   resources :locations
   resources :contacts
 
+  resources :searches, only: [ :index ]
+
   get "up" => "rails/health#show", as: :rails_health_check
   root "jobs#index"
 end

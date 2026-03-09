@@ -2,9 +2,9 @@ class Participation < ApplicationRecord
   include FtsSearchable
 
   ROLES = {
-    photographer: "Fotografo",
-    client: "Cliente",
-    subject: "Soggetto"
+    photographer: "photographer",
+    client: "client",
+    subject: "subject"
   }.freeze
 
   belongs_to :job

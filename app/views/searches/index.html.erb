@@ -1,0 +1,56 @@
+<%= turbo_frame_tag "omnibox_results" do %>
+  <% if @query.length >= 2 %>
+    <%= render layout: "layouts/autocomplete_results", locals: { query: nil, js_controller: "omnibox" } do %>
+
+      <%# --- SEZIONE CONTATTI --- %>
+      <% if @contacts.any? %>
+        <li class="menu-title flex items-center gap-2"><%= icon("users", classes: "w-4 h-4") %> Contatti</li>
+        <% @contacts.each do |contact| %>
+          <li>
+            <%= link_to contact_path(contact), data: { turbo_frame: "_top" } do %>
+              <div class="flex flex-col">
+                <span class="font-bold"><%= contact.display_name %></span>
+                <span class="text-xs opacity-70"><%= contact.kind %></span>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      <% end %>
+
+      <%# --- SEZIONE LOCATION --- %>
+      <% if @locations.any? %>
+        <% if @contacts.any? %><div class="divider my-0"></div><% end %>
+        <li class="menu-title flex items-center gap-2"><%= icon("map-pin", classes: "w-4 h-4") %> Location</li>
+        <% @locations.each do |location| %>
+          <li>
+            <%= link_to location_path(location), data: { turbo_frame: "_top" } do %>
+              <%= location.name %>
+            <% end %>
+          </li>
+        <% end %>
+      <% end %>
+
+      <%# --- SEZIONE LAVORI --- %>
+      <% if @jobs.any? %>
+        <% if @contacts.any? || @locations.any? %><div class="divider my-0"></div><% end %>
+        <li class="menu-title flex items-center gap-2"><%= icon("calendar", classes: "w-4 h-4") %> Lavori</li>
+        <% @jobs.each do |job| %>
+          <li>
+            <%= link_to job_path(job), data: { turbo_frame: "_top" } do %>
+              <div class="flex flex-col">
+                <span class="font-bold"><%= job.display_location %></span>
+                <span class="text-xs opacity-70"><%= job.date.strftime("%d/%m/%Y") %></span>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      <% end %>
+
+      <%# --- NESSUN RISULTATO --- %>
+      <% if @contacts.empty? && @locations.empty? && @jobs.empty? %>
+        <li class="disabled"><a class="italic">Nessun risultato per "<%= @query %>"</a></li>
+      <% end %>
+
+    <% end %>
+  <% end %>
+<% end %>
