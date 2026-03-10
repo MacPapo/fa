@@ -1,0 +1,70 @@
+<dialog id="command_palette"
+        class="modal"
+        data-controller="omnibox"
+        data-action="omnibox:open@window->omnibox#open keydown@window->omnibox#toggleShortcut">
+
+  <div class="modal-box p-0 max-w-3xl w-full h-[80vh] max-h-[650px] flex flex-col bg-base-100 rounded-xl overflow-hidden shadow-2xl">
+
+    <%# HEADER: Barra di ricerca gigante %>
+    <div class="border-b border-base-200 bg-base-100 p-4 sticky top-0 z-10 flex items-center gap-4">
+      <%= icon("search", classes: "w-6 h-6 text-primary") %>
+
+      <%= form_with url: searches_path, method: :get, class: "flex-1", data: { turbo_frame: "omnibox_results", omnibox_target: "form" } do |f| %>
+        <%= f.text_field :query,
+               class: "w-full bg-transparent text-xl font-medium focus:outline-none placeholder-base-content/40",
+               placeholder: "Cerca lavori, contatti, posizioni...",
+               autocomplete: "off",
+               data: {
+		 omnibox_target: "input",
+		 # La combo perfetta: search per la digitazione, navigate per le frecce/invio
+		 action: "input->omnibox#search keydown->omnibox#navigate"
+               } %>
+      <% end %>
+
+      <%# La "X" ora chiama clearInput per svuotare il campo e i risultati %>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost text-base-content/50 hover:text-base-content" data-action="click->omnibox#clearInput">✕</button>
+    </div>
+
+    <%# BODY: Risultati e Skeleton %>
+    <div class="flex-1 overflow-y-auto bg-base-100/30 p-2 relative">
+
+      <%# SKELETON (Nascosto di default) %>
+      <div data-omnibox-target="skeleton" class="hidden absolute inset-0 bg-base-100 z-10 p-4">
+        <div class="flex flex-col gap-3">
+          <% 4.times do %>
+            <div class="flex items-center gap-4 p-3 border border-base-200 rounded-lg bg-base-100/50">
+              <div class="skeleton w-10 h-10 rounded-lg shrink-0"></div>
+              <div class="flex flex-col gap-2 w-full">
+                <div class="skeleton h-4 w-1/3"></div>
+                <div class="skeleton h-3 w-1/4"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%# CONTENITORE RISULTATI TURBO %>
+      <div data-omnibox-target="results">
+        <%= turbo_frame_tag "omnibox_results", data: { action: "turbo:frame-load->omnibox#resultsLoaded" } do %>
+          <div class="p-12 flex flex-col items-center justify-center text-center text-base-content/40 h-full mt-10">
+            <%= icon("search", classes: "w-12 h-12 mb-4 opacity-20") %>
+            <p class="text-lg">Cosa stai cercando?</p>
+            <p class="text-sm mt-1">Digita almeno 2 caratteri per iniziare la ricerca globale.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# FOOTER %>
+    <div class="bg-base-200 px-4 py-3 text-xs text-base-content/50 border-t border-base-300 flex gap-6">
+      <span class="flex items-center gap-1"><kbd class="kbd kbd-xs bg-base-100">↑</kbd> <kbd class="kbd kbd-xs bg-base-100">↓</kbd> Naviga</span>
+      <span class="flex items-center gap-1"><kbd class="kbd kbd-xs bg-base-100">↵</kbd> Apri</span>
+      <span class="flex items-center gap-1"><kbd class="kbd kbd-xs bg-base-100">ESC</kbd> Chiudi</span>
+    </div>
+  </div>
+
+  <%# Backdrop per chiudere cliccando fuori %>
+  <form method="dialog" class="modal-backdrop bg-base-content/20 backdrop-blur-sm transition-opacity">
+    <button data-action="click->omnibox#close">chiudi</button>
+  </form>
+</dialog>

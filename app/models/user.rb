@@ -4,4 +4,8 @@ class User < ApplicationRecord
 
   validates :nickname, presence: true, uniqueness: true
   normalizes :nickname, with: ->(e) { e.strip.downcase }
+
+  def avatar
+    nickname.first.upcase
+  end
 end

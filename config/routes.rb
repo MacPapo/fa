@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
   resources :locations
   resources :contacts
+  resources :users
 
   resources :searches, only: [ :index ]
 

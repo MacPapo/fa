@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Fa" %></title>
+    <title>Login - <%= content_for?(:title) ? yield(:title) : "Fa" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Fa">
@@ -9,27 +9,24 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+
     <%= yield :head %>
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= render "layouts/navbar" %>
-    <%= render "layouts/flash" %>
-    <main class="container mx-auto mt-8 px-5">
+  <body class="bg-base-200 min-h-screen flex items-center justify-center p-4">
+
+    <main class="w-full max-w-md">
+      <%= render "layouts/flash" %>
+
       <%= yield %>
     </main>
 
-    <%= turbo_frame_tag "modal" %>
-    <%= render "layouts/command_palette" %>
   </body>
 </html>

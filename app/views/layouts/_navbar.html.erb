@@ -1,74 +1,37 @@
-<header class="navbar bg-base-100 shadow-sm">
+<header class="navbar sticky top-0 z-50 bg-base-100/80 backdrop-blur">
+
   <div class="navbar-start">
-    <a class="btn btn-ghost text-xl">FA</a>
+    <%= link_to root_path, class: "btn btn-ghost gap-2" do %>
+      <%= icon("dirty_lens", classes: "w-7 h-7") %>
+      <span class="text-lg font-mono mt-[2px]">fa</span>
+    <% end %>
   </div>
-  <div class="navbar-center flex">
-    <ul class="menu menu-horizontal px-1">
-      <li><%= link_to "Lavori", jobs_path %></li>
-      <li><%= link_to "Contatti", contacts_path %></li>
-      <li><%= link_to "Posizioni", locations_path %></li>
+
+  <div class="navbar-center flex hidden lg:flex">
+    <ul class="menu menu-horizontal px-1 font-medium text-base-content/80">
+      <li>
+	<%= link_to jobs_path do %>
+	  <%= icon("photo_library", classes: "w-4 h-4 opacity-50") %>
+	  <span>Lavori</span>
+	<% end %>
+      </li>
+      <li>
+	<%= link_to contacts_path do %>
+	  <%= icon("contacts", classes: "w-4 h-4 opacity-50") %>
+	  <span>Contatti</span>
+	<% end %>
+      </li>
+      <li>
+	<%= link_to locations_path do %>
+	  <%= icon("locations", classes: "w-4 h-4 opacity-50") %>
+	  <span>Posizioni</span>
+	<% end %>
+      </li>
     </ul>
   </div>
-  <div class="navbar-end flex gap-2">
-    <div class="relative w-full max-w-xs sm:max-w-sm" data-controller="omnibox">
 
-      <%= form_with url: searches_path,
-		    method: :get,
-		    class: "w-full",
-		    data: {
-		      turbo_frame: "omnibox_results",
-		      omnibox_target: "form"
-		    } do |f| %>
-
-        <label class="input flex items-center gap-2 w-full bg-base-200 focus-within:bg-base-100 transition-colors">
-          <%= icon("search", classes: "w-5 h-5 opacity-70") %>
-
-          <%= f.text_field :query,
-           class: "grow w-full",
-           placeholder: "Cerca...",
-           autocomplete: "off",
-           data: {
-             omnibox_target: "input",
-             action: "input->omnibox#search keydown@window->omnibox#focusShortcut blur->omnibox#close focus->omnibox#open"
-           } %>
-
-          <kbd class="kbd kbd-sm hidden sm:inline-flex">⌘</kbd>
-          <kbd class="kbd kbd-sm hidden sm:inline-flex">K</kbd>
-        </label>
-      <% end %>
-
-      <%# CONTENITORE RISULTATI %>
-      <%# Aggiunto left-0 right-0 così prende l'esatta larghezza della barra di ricerca %>
-      <div data-omnibox-target="dropdown" class="absolute top-full left-0 right-0 mt-2 bg-base-100 shadow-xl rounded-box border border-base-200 z-50 hidden max-h-[70vh] overflow-y-auto">
-        <%= turbo_frame_tag "omnibox_results" %>
-      </div>
-
-    </div>
-    <%# 2. IL CONTENITORE DEI RISULTATI (Se manca questo, Turbo fa il redirect!) %>
-    <div data-omnibox-target="dropdown" class="absolute top-full left-0 right-0 mt-2 bg-base-100 shadow-xl rounded-box border border-base-200 z-50 hidden max-h-[70vh] overflow-y-auto">
-      <%# Turbo cercherà questo ID per iniettare l'HTML di _autocomplete_results %>
-      <%= turbo_frame_tag "omnibox_results" %>
-    </div>
-    <div class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-        <div class="w-10 rounded-full">
-          <img
-            alt="Tailwind CSS Navbar component"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-        </div>
-      </div>
-      <ul
-        tabindex="-1"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li>
-          <a class="justify-between">
-            Profile
-            <span class="badge">New</span>
-          </a>
-        </li>
-        <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
-      </ul>
-    </div>
+  <div class="navbar-end flex gap-3">
+    <%= render "layouts/omnibox" %>
+    <%= render "layouts/user_menu" %>
   </div>
 </header>
