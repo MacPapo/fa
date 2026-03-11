@@ -1,0 +1,52 @@
+<li id="<%= dom_id location %>" class="list-row group hover:bg-base-200/50 transition-colors relative items-center">
+
+  <%# Avatar %>
+  <div>
+    <div class="avatar avatar-placeholder">
+      <div class="bg-neutral text-neutral-content w-8 rounded-full">
+        <span class="text-xs">
+          <%= location.avatar_initials %>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <%# Colonna principale elastica (.list-col-grow) %>
+  <div class="list-col-grow min-w-0">
+    <div class="truncate">
+      <%# Il before:absolute rende l'intera riga cliccabile. Usiamo solo 'name' qui. %>
+      <%= link_to location.name, location_path(location), class: "font-semibold before:absolute before:inset-0 before:z-0", data: { turbo_frame: "_top" } %>
+    </div>
+    <div class="text-xs opacity-60 truncate flex items-center gap-1">
+      <%= icon("location", classes: "size-3") %>
+      <%= location.district.presence || "Nessun sestiere" %>
+    </div>
+  </div>
+
+  <div class="hidden sm:flex flex-col text-right justify-center pr-4 min-w-32">
+    <%# Spazio vuoto intenzionale per mantenere la griglia se necessario,
+        oppure potresti mostrare il numero di 'jobs' associati in futuro! %>
+  </div>
+
+  <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 sm:opacity-0 opacity-100 transition-opacity relative z-10">
+    <%= link_to edit_location_path(location),
+		class: "btn btn-square btn-ghost btn-sm",
+		data: {
+		  turbo_frame: "modal"
+		} do %>
+      <%= icon("edit", classes: "size-4 opacity-50") %>
+    <% end %>
+
+    <%= button_to location_path(location),
+		  method: :delete,
+		  class: "btn btn-square btn-ghost btn-sm hover:text-error",
+		  form: {
+		    data: {
+		      turbo_confirm: "Eliminare?"
+		    }
+		  } do %>
+      <%= icon("trash", classes: "size-4 opacity-50") %>
+    <% end %>
+  </div>
+
+</li>

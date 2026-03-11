@@ -1,10 +1,12 @@
-<li id="<%= dom_id contact %>" class="list-row group hover:bg-base-200/50 transition-colors relative">
+<li id="<%= dom_id contact %>" class="list-row group hover:bg-base-200/50 transition-colors relative items-center">
 
   <%# Avatar %>
   <div>
-    <div class="avatar placeholder">
-      <div class="bg-base-200 text-base-content rounded-full w-10 border border-base-300">
-        <span class="text-xs font-bold uppercase"><%= contact.display_name.chr %></span>
+    <div class="avatar avatar-placeholder">
+      <div class="bg-neutral text-neutral-content w-8 rounded-full">
+	<span class="text-xs">
+	  <%= contact.avatar_initials %>
+	</span>
       </div>
     </div>
   </div>

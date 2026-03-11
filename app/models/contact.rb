@@ -1,5 +1,5 @@
 class Contact < ApplicationRecord
-  include FtsSearchable
+  include FtsSearchable, Avatarable
 
   enum :kind, { person: 0, company: 1 }
 

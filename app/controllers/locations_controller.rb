@@ -2,7 +2,10 @@ class LocationsController < ApplicationController
   before_action :set_location, only: %i[ show edit update destroy ]
 
   def index
-    @pagy, @locations = pagy(Location.order(:name))
+    @total_locations = Location.count
+    @locations = LocationQuery.new(Location.all, params).resolve
+
+    @pagy, @locations = pagy(@locations)
   end
 
   def show

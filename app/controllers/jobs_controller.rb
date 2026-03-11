@@ -3,21 +3,8 @@ class JobsController < ApplicationController
 
   # GET /jobs
   def index
-    base_query = Job.includes(:locations, participations: :contact)
-
-    @jobs = case params[:filter]
-    when "future"
-              base_query.where("date >= ?", Date.current).order(date: :asc)
-    when "unassigned"
-              # Usiamo un left outer join per trovare i job senza fotografi
-              base_query.left_outer_joins(:participations)
-                .where(participations: { id: nil })
-                .or(base_query.left_outer_joins(:participations).where.not(participations: { role: Participation::ROLES[:photographer] }))
-                .group("jobs.id")
-                .order(date: :desc)
-    else
-              base_query.recent
-    end
+    @total_jobs = Job.count
+    @jobs = JobQuery.new(Job.all, params).resolve
 
     @pagy, @jobs = pagy(@jobs)
   end

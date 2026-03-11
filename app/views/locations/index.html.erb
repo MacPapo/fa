@@ -1,39 +1,129 @@
-<div class="w-full max-w-5xl mx-auto mt-8">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">Locations</h1>
+<div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
 
-    <%# Questo link dice a Turbo: "Prendi l'HTML di questa pagina, ma ficca solo la parte del modale nel frame 'modal'" %>
-    <%= link_to "Nuova Location", new_location_path, class: "btn btn-primary", data: { turbo_frame: "modal" } %>
-  </div>
+  <%# Begin of Header %>
+  <div class="mt-6 mb-8">
 
-  <div class="overflow-x-auto bg-base-100 rounded-box shadow-xl border border-base-200">
-    <table class="table table-zebra w-full">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Provincia/Zona</th>
-          <th class="text-right">Azioni</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @locations.each do |location| %>
-          <tr class="hover">
-            <td>
-              <div class="font-bold">
-                <%= link_to location.name, location, class: "link link-hover", data: { turbo_frame: "_top" } %>
-              </div>
-            </td>
-            <td><%= location.district.presence || "-" %></td>
-            <td class="text-right flex justify-end gap-2">
-              <%= link_to "Modifica", edit_location_path(location), class: "btn btn-sm btn-ghost", data: { turbo_frame: "modal" } %>
+    <div class="flex flex-row items-center justify-between gap-4">
 
-              <%# Tasto elimina con conferma %>
-              <%= button_to "Elimina", location, method: :delete, class: "btn btn-sm btn-ghost text-error", form: { data: { turbo_confirm: "Sei sicuro di voler eliminare questa location?" } } %>
-            </td>
-          </tr>
+      <div class="flex items-center gap-3">
+        <h1 class="text-3xl font-bold">Posizioni</h1>
+        <div class="badge badge-ghost font-medium">
+          <%= @total_locations %> totali
+        </div>
+      </div>
+
+      <%# Bottone Nuova Posizione %>
+      <div class="flex-none">
+        <%= link_to new_location_path,
+		    class: "btn btn-primary btn-sm",
+		    data: { turbo_frame: "modal" } do %>
+          <%= icon("plus", classes: "size-4") %>
+          <span class="hidden sm:inline">Nuova Posizione</span>
         <% end %>
-      </tbody>
-    </table>
+      </div>
+
+    </div>
+
+    <p class="mt-2 text-sm text-base-content/70">
+      Gestisci i luoghi dei tuoi servizi. Cerca e aggiungi chiese, ristoranti, ville o qualsiasi altra posizione.
+    </p>
+
   </div>
-  <%== @pagy.series_nav %>
+  <%# End of Header %>
+
+  <%# 2. TOOLBAR UNIFICATA %>
+  <%= form_with url: locations_path,
+		method: :get,
+		class: "flex flex-col md:flex-row md:items-center gap-4 mb-6",
+		data: {
+		  turbo_frame: "locations_list",
+		  turbo_action: "advance",
+		  controller: "autosubmit"
+		} do |f| %>
+
+    <%# Ricerca testuale %>
+    <label class="input input-sm flex items-center w-full md:w-72 shrink-0">
+      <%= icon("search", classes: "size-4 opacity-50") %>
+      <%= f.search_field :query,
+       value: params[:query],
+       class: "grow",
+       autocomplete: "off",
+       placeholder: "Cerca contatto...",
+       data: { action: "input->autosubmit#submit keydown.enter->autosubmit#prevent" } %>
+    </label>
+
+    <div class="flex flex-row items-center justify-between gap-4 w-full md:grow">
+
+      <%= f.select :sort,
+          options_for_select([['Più recenti', 'recent'], ['Alfabetico', 'alpha']], params[:sort] || 'recent'),
+       {},
+       {
+	 class: "select select-sm md:ml-auto w-full md:w-auto cursor-pointer",
+	 data: {
+	   action: "change->autosubmit#submit"
+	 }
+       }
+      %>
+    </div>
+
+  <% end %>
+  <%# End of Toolbar %>
+
+  <%# WRAPPER TURBO %>
+  <%= turbo_frame_tag "locations_list" do %>
+
+    <% if params[:query].present? || params[:filter].present? %>
+      <div class="mb-4 text-sm font-medium text-base-content/70 flex items-center gap-2 animate-fade-in">
+        <%= icon("check_circle", classes: "size-4 text-success") %>
+        <span>
+          Trovati <strong class="text-base-content"><%= @pagy.count %></strong> risultati
+          <% if params[:query].present? %>
+            per "<span class="italic"><%= params[:query] %></span>"
+          <% end %>
+        </span>
+      </div>
+    <% end %>
+
+    <%# Begin of List %>
+    <% if @locations.any? %>
+
+      <ul class="list bg-base-100 rounded-box shadow-md">
+
+        <li class="p-4 pb-2 text-xs opacity-60 tracking-wide flex justify-between items-end">
+          <span>Luoghi Registrati</span>
+          <span class="tracking-normal"><%= @pagy.count %> voci</span>
+        </li>
+
+        <%= render @locations %>
+      </ul>
+
+    <% else %>
+
+      <div class="hero bg-base-100 rounded-box shadow-md py-16">
+        <div class="hero-content text-center">
+          <div class="max-w-md">
+            <%= icon("locations", classes: "size-12 opacity-20 mx-auto mb-4") %>
+            <h2 class="text-xl font-bold">Nessun risultato</h2>
+            <% if params[:query].present? %>
+              <p class="py-4 opacity-60">Non abbiamo trovato nulla per "<strong><%= params[:query] %></strong>". Prova a cercare con termini diversi.</p>
+            <% else %>
+              <p class="py-4 opacity-60">Non hai ancora registrato nessuna posizione nel sistema. Inizia ad aggiungerne una per usarla nei tuoi servizi.</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+    <% end %>
+    <%# End of List %>
+
+    <%# La paginazione resta qui dentro %>
+    <% if @pagy.pages > 1 %>
+      <div class="mt-8 flex justify-center">
+        <%== @pagy.series_nav %>
+      </div>
+    <% end %>
+
+  <% end %>
+  <%# End of Wrapper %>
+
 </div>

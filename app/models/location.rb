@@ -1,5 +1,5 @@
 class Location < ApplicationRecord
-  include FtsSearchable
+  include FtsSearchable, Avatarable
 
   has_many :job_locations, dependent: :restrict_with_error
   has_many :jobs, through: :job_locations

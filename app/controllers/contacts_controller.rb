@@ -2,6 +2,7 @@ class ContactsController < ApplicationController
   before_action :set_contact, only: %i[ show edit update destroy ]
 
   def index
+    @total_contacts = Contact.count
     @contacts = ContactQuery.new(Contact.all, params).resolve
 
     @pagy, @contacts = pagy(@contacts)
