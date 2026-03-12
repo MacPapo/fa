@@ -40,7 +40,7 @@ class Job < ApplicationRecord
   end
 
   def display_location
-    return locations.map(&:name).join(" - ") if locations.any?
+    return locations.map(&:name).join(" → ") if locations.any?
 
     legacy_location_text.presence || "Location sconosciuta"
   end

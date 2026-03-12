@@ -1,0 +1,62 @@
+<%= form_with url: target_url,
+	      method: :get,
+	      class: "flex flex-col lg:flex-row lg:items-center gap-4 mb-6",
+	      data: {
+		turbo_frame: turbo_frame,
+		turbo_action: "advance",
+		controller: "autosubmit"
+	      } do |f| %>
+
+  <label class="input input-sm flex items-center w-full lg:w-72 shrink-0">
+    <%= icon("search", classes: "size-4 opacity-50") %>
+    <%= f.search_field :query,
+     value: params[:query],
+     class: "grow",
+     autocomplete: "off",
+     placeholder: "Cerca servizio...",
+     data: { action: "input->autosubmit#submit keydown.enter->autosubmit#prevent" } %>
+  </label>
+
+  <div class="flex flex-row flex-wrap lg:flex-nowrap items-center justify-between gap-4 w-full">
+    <div class="flex items-center grow gap-2">
+
+      <%= f.select :period,
+       options_for_select([
+	 ['Tutti i periodi', ''],
+	 ['Prossimi futuri', 'upcoming'],
+	 ['Passati', 'past']
+       ], params[:period]),
+       {},
+       {
+	 class: "select select-sm w-full lg:w-auto cursor-pointer",
+	 data: { action: "change->autosubmit#submit" }
+       } %>
+
+      <%= f.select :video,
+       options_for_select([
+	 ['Tutte le tipologie', ''],
+	 ['Solo Foto', 'false'],
+	 ['Con Video', 'true']
+       ], params[:video]),
+       {},
+       {
+	 class: "select select-sm w-full lg:w-auto cursor-pointer",
+	 data: { action: "change->autosubmit#submit" }
+       } %>
+    </div>
+
+    <%= f.select :sort,
+     options_for_select([
+       ['Ordinamento Smart', ''],
+       ['Data (Crescente)', 'date_asc'],
+       ['Data (Decrescente)', 'date_desc']
+     ], params[:sort]),
+     {},
+     {
+       class: "select select-sm lg:ml-auto w-full lg:w-auto cursor-pointer",
+       data: {
+	 action: "change->autosubmit#submit"
+       }
+     } %>
+  </div>
+<% end %>

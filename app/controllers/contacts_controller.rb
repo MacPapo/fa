@@ -9,9 +9,10 @@ class ContactsController < ApplicationController
   end
 
   def show
-    @participations = @contact.participations
-                        .includes(job: :locations)
-                        .order("jobs.date DESC")
+    @total_contact_jobs = @contact.jobs.count
+    @jobs = JobQuery.new(@contact.jobs, params).resolve
+
+    @pagy, @jobs = pagy(@jobs)
   end
 
   def new

@@ -1,36 +1,40 @@
 <%= turbo_stream_from @job %>
 
-<div id="<%= dom_id(@job) %>" class="max-w-5xl mx-auto pb-12">
+<div id="<%= dom_id(@job) %>" class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
 
-  <%# ========================================== %>
-  <%# HEADER: Breadcrumbs, Titolo e Azioni       %>
-  <%# ========================================== %>
-  <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+  <div class="mt-6 mb-2">
+    <%= link_to jobs_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-base-content/50 hover:text-base-content transition-colors" do %>
+      <%= icon("chevron_left", classes: "size-4") %>
+      <span>Torna ai Servizi</span>
+    <% end %>
+  </div>
 
-    <div>
-      <div class="breadcrumbs text-sm text-base-content/60 mb-2">
-        <ul>
-          <li><%= link_to "Lavori", jobs_path, class: "hover:underline" %></li>
-          <li><%= @job.date.strftime("%Y") %></li>
-        </ul>
-      </div>
+  <%# 2. HEADER ENTITÀ REFINED FLOW E MOBILE-PROOF %>
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-5">
 
-      <h1 class="text-3xl sm:text-4xl font-extrabold flex items-center gap-3">
-        <%= @job.display_title %>
-
+    <%# BLOCCO SINISTRA: Identità e Contesto %>
+    <div class="flex flex-col gap-2 flex-1 min-w-0">
+      <div class="flex items-center flex-wrap gap-2">
+        <h1 class="text-2xl sm:text-3xl font-extrabold break-words"><%= @job.display_title %></h1>
         <% if @job.with_video? %>
-          <span class="badge badge-primary badge-outline font-bold">VIDEO</span>
+          <div class="badge badge-primary badge-outline font-bold whitespace-nowrap">VIDEO</div>
         <% end %>
-      </h1>
+      </div>
     </div>
 
-    <div class="flex items-center gap-2">
-      <%= link_to "Modifica", edit_job_path(@job), class: "btn btn-outline" %>
+    <%# BLOCCO DESTRA: Azioni Lavoro %>
+    <div class="flex items-center gap-2 shrink-0 pt-1">
+      <%= link_to edit_job_path(@job), class: "btn btn-outline btn-sm" do %>
+        <%= icon("edit", classes: "size-4") %>
+        <span class="hidden sm:inline">Modifica</span>
+      <% end %>
 
-      <%= button_to "Elimina", @job,
+      <%= button_to @job,
 		    method: :delete,
-		    form: { data: { turbo_confirm: "Sei sicuro?" } },
-		    class: "btn btn-ghost text-error" %>
+		    class: "btn btn-ghost text-error btn-sm hover:bg-error/10",
+		    data: { turbo_confirm: "Sei sicuro di voler eliminare questo servizio?" } do %>
+        <%= icon("trash", classes: "size-4") %>
+      <% end %>
     </div>
 
   </div>
@@ -48,7 +52,7 @@
     <div class="lg:col-span-2 flex flex-col gap-8">
 
       <%# --- BLOCCO: Info Logistiche --- %>
-      <div class="flex flex-wrap gap-8 p-6 bg-base-100 rounded-box border border-base-200">
+      <div class="flex flex-wrap gap-8 p-6 bg-base-100 rounded-box shadow-sm border border-base-200">
 
         <div>
           <div class="text-xs font-bold uppercase opacity-50 mb-1">Data</div>
@@ -71,7 +75,7 @@
         </div>
 
         <div class="flex-1 min-w-[200px]">
-          <div class="text-xs font-bold uppercase opacity-50 mb-1">Location</div>
+          <div class="text-xs font-bold uppercase opacity-50 mb-1">Itinerario</div>
           <div class="text-lg font-medium">
             <%= @job.display_location %>
           </div>
@@ -98,7 +102,7 @@
         <% clients       = @job.participations.select { |p| p.role == Participation::ROLES[:client] } %>
         <% subjects      = @job.participations.select { |p| p.role == Participation::ROLES[:subject] } %>
 
-        <ul class="list bg-base-100 rounded-box border border-base-200">
+        <ul class="list bg-base-100 rounded-box shadow-sm border border-base-200">
 
           <%# --- FOTOGRAFI --- %>
           <li class="p-4 pb-2 text-xs font-bold opacity-50 uppercase tracking-wider">Fotografi</li>
@@ -107,13 +111,15 @@
             <% photographers.each do |participation| %>
               <li class="list-row items-center">
 
-                <div class="w-10 h-10 rounded-full bg-base-300 flex items-center justify-center font-bold">
-                  <%= participation.contact.display_name.first(2).upcase %>
+                <div class="avatar avatar-placeholder shrink-0">
+                  <div class="bg-primary/10 text-primary rounded-full w-10">
+                    <span class="font-bold text-sm"><%= participation.contact.display_name.first(2).upcase %></span>
+                  </div>
                 </div>
 
-                <div class="flex-1">
-                  <div class="font-bold"><%= participation.contact.display_name %></div>
-                  <div class="text-sm opacity-60">
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold truncate"><%= participation.contact.display_name %></div>
+                  <div class="text-sm opacity-60 truncate">
                     <%= [participation.title, participation.contact.phone].compact_blank.join(" • ") %>
                   </div>
                 </div>
@@ -136,14 +142,16 @@
             <% clients.each do |participation| %>
               <li class="list-row items-center">
 
-                <div class="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center font-bold">
-                  <%= participation.contact.display_name.first(2).upcase %>
+                <div class="avatar avatar-placeholder shrink-0">
+                  <div class="bg-secondary/10 text-secondary rounded-full w-10">
+                    <span class="font-bold text-sm"><%= participation.contact.display_name.first(2).upcase %></span>
+                  </div>
                 </div>
 
-                <div class="flex-1">
-                  <div class="font-bold"><%= participation.contact.display_name %></div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold truncate"><%= participation.contact.display_name %></div>
                   <% if participation.title.present? || participation.contact.email.present? %>
-                    <div class="text-sm opacity-60">
+                    <div class="text-sm opacity-60 truncate">
                       <%= [participation.title, participation.contact.email].compact_blank.join(" • ") %>
                     </div>
                   <% end %>
@@ -163,15 +171,17 @@
             <% subjects.each do |participation| %>
               <li class="list-row items-center">
 
-                <div class="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center font-bold">
-                  <%= participation.contact.display_name.first(2).upcase %>
+                <div class="avatar avatar-placeholder shrink-0">
+                  <div class="bg-base-200 text-base-content rounded-full w-10">
+                    <span class="font-bold text-sm"><%= participation.contact.display_name.first(2).upcase %></span>
+                  </div>
                 </div>
 
-                <div class="flex-1">
-                  <div class="font-bold"><%= participation.contact.display_name %></div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold truncate"><%= participation.contact.display_name %></div>
 
                   <% if participation.title.present? %>
-                    <div class="text-sm opacity-80 font-medium italic">
+                    <div class="text-sm opacity-80 font-medium italic truncate">
                       in veste di <%= participation.title %>
                     </div>
                   <% end %>
@@ -192,7 +202,7 @@
     <%# ---------------------------------------- %>
     <div class="lg:col-span-1 flex flex-col gap-6">
 
-      <div class="bg-base-100 rounded-box border border-base-200 p-5 text-sm">
+      <div class="bg-base-100 rounded-box shadow-sm border border-base-200 p-5 text-sm">
         <div class="font-bold uppercase opacity-50 mb-4 tracking-wider text-xs">Sistema</div>
 
         <div class="flex justify-between items-center py-2 border-b border-base-200">
@@ -213,7 +223,7 @@
 
       <%# Dati Legacy (se presenti) %>
       <% if @job.legacy_data.present? && @job.legacy_data.keys.present? %>
-        <div class="collapse collapse-arrow bg-base-100 border border-base-200">
+        <div class="collapse collapse-arrow bg-base-100 shadow-sm border border-base-200">
           <input type="checkbox" />
           <div class="collapse-title text-sm font-bold opacity-70 flex items-center gap-2">
             Dati Legacy (JSON)

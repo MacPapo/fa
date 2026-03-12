@@ -1,68 +1,158 @@
-<div class="mb-6">
-  <%= link_to "← Torna alla Rubrica", contacts_path, class: "btn btn-sm btn-ghost" %>
-</div>
+<div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
 
-<div class="flex flex-col sm:flex-row justify-between items-start mb-8 gap-4">
-  <div>
-    <h1 class="text-4xl font-bold"><%= @contact.display_name %></h1>
-    <div class="badge badge-neutral mt-2"><%= @contact.kind == "person" ? "Persona Fisica" : "Azienda/Ente" %></div>
+  <%# 1. NAVIGAZIONE (Subtle Back Link) %>
+  <div class="mt-6 mb-2">
+    <%= link_to contacts_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-base-content/50 hover:text-base-content transition-colors" do %>
+      <%= icon("chevron_left", classes: "size-4") %>
+      <span>Torna alla Rubrica</span>
+    <% end %>
   </div>
 
-  <%# Bottone Modifica che apre il modale sopra la Show! %>
-  <%= link_to "Modifica Contatto", edit_contact_path(@contact), class: "btn btn-outline", data: { turbo_frame: "modal" } %>
-</div>
+  <%# 2. HEADER ENTITÀ REFINED FLOW E MOBILE-PROOF %>
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-5">
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-  <div class="card bg-base-100 shadow-sm border border-base-200">
-    <div class="card-body">
-      <h2 class="card-title text-base-content/70 text-sm uppercase">Recapiti</h2>
-      <p class="text-lg"><strong>Email:</strong> <%= @contact.email.presence || "-" %></p>
-      <p class="text-lg"><strong>Telefono:</strong> <%= @contact.phone.presence || "-" %></p>
+    <%# BLOCCO SINISTRA: Identità e Contesto (Tutto raggruppato) %>
+    <div class="flex flex-col gap-3 flex-1 min-w-0">
+
+      <div class="flex items-start gap-3">
+        <%# Avatar: Nascondiamo su schermi piccolissimi per fare spazio, visibile da 'sm' %>
+        <div class="avatar avatar-placeholder hidden sm:flex shrink-0 mt-1">
+          <div class="<%= @contact.kind == 'person' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary' %> rounded-full w-12 sm:w-14">
+            <span class="text-lg sm:text-xl font-bold"><%= @contact.avatar_initials %></span>
+          </div>
+        </div>
+
+        <div class="flex flex-col flex-1 min-w-0">
+          <%# Prima Riga: Titolo e Badge %>
+          <div class="flex items-center flex-wrap gap-2">
+            <h1 class="text-2xl sm:text-3xl font-bold break-words"><%= @contact.display_name %></h1>
+            <div class="badge <%= @contact.kind == 'person' ? 'badge-primary badge-outline' : 'badge-secondary badge-outline' %> whitespace-nowrap">
+              <%= @contact.kind == "person" ? "Persona Fisica" : "Azienda/Ente" %>
+            </div>
+            <div class="badge badge-ghost font-medium whitespace-nowrap hidden sm:inline-flex">
+              <%= @total_contact_jobs %> servizi totali
+            </div>
+          </div>
+
+          <%# Seconda Riga (Opzionale): Metadati compatti se esistono %>
+          <% if @contact.email.present? || @contact.phone.present? || @contact.vat_number.present? || @contact.tax_id.present? %>
+            <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-base-content/70">
+
+              <% if @contact.email.present? %>
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <%= icon("email", classes: "size-4 opacity-50 shrink-0") %>
+                  <span class="truncate"><%= @contact.email %></span>
+                </div>
+              <% end %>
+
+              <% if @contact.phone.present? %>
+                <div class="flex items-center gap-1.5 whitespace-nowrap">
+                  <%= icon("phone", classes: "size-4 opacity-50 shrink-0") %>
+                  <span><%= @contact.phone %></span>
+                </div>
+              <% end %>
+
+              <% if @contact.vat_number.present? %>
+                <div class="flex items-center gap-1.5 whitespace-nowrap">
+                  <span class="text-xs font-bold uppercase tracking-wider opacity-50">P.IVA</span>
+                  <span class="font-mono"><%= @contact.vat_number %></span>
+                </div>
+              <% end %>
+
+              <% if @contact.tax_id.present? %>
+                <div class="flex items-center gap-1.5 whitespace-nowrap">
+                  <span class="text-xs font-bold uppercase tracking-wider opacity-50">C.F.</span>
+                  <span class="font-mono"><%= @contact.tax_id %></span>
+                </div>
+              <% end %>
+
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Descrizione logicamente agganciata ai dati anagrafici %>
+      <p class="text-sm text-base-content/70">
+        Dettagli anagrafici del contatto e storico di tutti i servizi in cui ha partecipato.
+      </p>
+
     </div>
-  </div>
 
-  <div class="card bg-base-100 shadow-sm border border-base-200">
-    <div class="card-body">
-      <h2 class="card-title text-base-content/70 text-sm uppercase">Dati Fiscali</h2>
-      <p class="text-lg"><strong>P.IVA:</strong> <%= @contact.vat_number.presence || "-" %></p>
-      <p class="text-lg"><strong>Cod. Fiscale:</strong> <%= @contact.tax_id.presence || "-" %></p>
-    </div>
-  </div>
-</div>
-
-<h2 class="text-2xl font-bold mb-4">Storico Lavori (<%= @participations.count %>)</h2>
-
-<div class="overflow-x-auto bg-base-100 shadow-sm rounded-box border border-base-200">
-  <table class="table w-full">
-    <thead>
-      <tr>
-        <th>Data</th>
-        <th>Lavoro</th>
-        <th>Ruolo</th>
-        <th>Veste (Titolo)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if @participations.any? %>
-        <% @participations.each do |participation| %>
-          <tr class="hover">
-            <td class="whitespace-nowrap"><%= l(participation.job.date, format: :short) rescue participation.job.date %></td>
-            <td>
-              <%= link_to participation.job.display_title, job_path(participation.job), class: "link link-primary font-bold" %>
-            </td>
-            <td>
-              <div class="badge badge-ghost"><%= participation.role.humanize %></div>
-            </td>
-            <td class="italic"><%= participation.title.presence || "-" %></td>
-          </tr>
-        <% end %>
-      <% else %>
-        <tr>
-          <td colspan="4" class="text-center py-6 text-base-content/50 italic">
-            Nessun lavoro registrato per questo contatto.
-          </td>
-        </tr>
+    <%# BLOCCO DESTRA: Azioni Contatto (A destra su desktop, a capo su mobile) %>
+    <div class="flex items-center gap-2 shrink-0 pt-1">
+      <%= link_to edit_contact_path(@contact), class: "btn btn-outline btn-sm", data: { turbo_frame: "modal" } do %>
+        <%= icon("edit", classes: "size-4") %>
+        <span class="hidden sm:inline">Modifica</span>
       <% end %>
-    </tbody>
-  </table>
+      <%= button_to contact_path(@contact), method: :delete, class: "btn btn-ghost text-error btn-sm hover:bg-error/10", form: { data: { turbo_confirm: "Sei sicuro di voler eliminare questo contatto?" } } do %>
+        <%= icon("trash", classes: "size-4") %>
+      <% end %>
+    </div>
+
+  </div>
+  <%# End of Header %>
+
+  <%# 3. TOOLBAR MINI-INDEX %>
+  <%= render "jobs/filter_bar", target_url: contact_path(@contact), turbo_frame: "contact_jobs_list" %>
+
+  <%# WRAPPER TURBO %>
+  <%= turbo_frame_tag "contact_jobs_list" do %>
+
+    <%# Feedback Risultati Ricerca %>
+    <% if params[:query].present? || params[:period].present? || params[:video].present? %>
+      <div class="mb-4 text-sm font-medium text-base-content/70 flex items-center gap-2 animate-fade-in">
+        <%= icon("check_circle", classes: "size-4 text-success") %>
+        <span>
+          Trovati <strong class="text-base-content"><%= @pagy.count %></strong> servizi
+          <% if params[:query].present? %>
+            per "<span class="italic"><%= params[:query] %></span>"
+          <% end %>
+        </span>
+      </div>
+    <% end %>
+
+    <%# Begin of List %>
+    <% if @jobs.any? %>
+
+      <ul class="list bg-base-100 rounded-box shadow-md">
+        <li class="p-4 pb-2 text-xs opacity-60 tracking-wide flex justify-between items-end">
+          <span>Storico Servizi</span>
+          <span class="tracking-normal"><%= @pagy.count %> voci</span>
+        </li>
+
+        <%= render partial: "jobs/job", collection: @jobs %>
+      </ul>
+
+    <% else %>
+
+      <%# Empty State Hero %>
+      <div class="hero bg-base-100 rounded-box shadow-md py-16">
+        <div class="hero-content text-center">
+          <div class="max-w-md">
+            <%= icon("camera", classes: "size-12 opacity-20 mx-auto mb-4") %>
+            <h2 class="text-xl font-bold">Nessun servizio</h2>
+            <% if params[:query].present? %>
+              <p class="py-4 opacity-60">
+                Non abbiamo trovato nessun servizio per "<strong><%= params[:query] %></strong>" associato a questo contatto.</p>
+            <% else %>
+              <p class="py-4 opacity-60">
+                Questo contatto non ha ancora partecipato a nessun servizio. Lo vedrai comparire qui quando lo aggiungerai a un servizio.</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+    <% end %>
+    <%# End of List %>
+
+    <%# Paginazione %>
+    <% if @pagy.pages > 1 %>
+      <div class="mt-8 flex justify-center">
+        <%== @pagy.series_nav %>
+      </div>
+    <% end %>
+
+  <% end %>
+  <%# End of Wrapper %>
+
 </div>

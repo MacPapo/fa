@@ -1,5 +1,6 @@
 class JobsController < ApplicationController
-  before_action :set_job, only: %i[ show edit update destroy ]
+  before_action :set_job_with_associations, only: %i[ show edit ]
+  before_action :set_job, only: %i[ update destroy ]
 
   # GET /jobs
   def index
@@ -38,6 +39,7 @@ class JobsController < ApplicationController
     if @job.update(job_params)
       redirect_to @job, notice: "Lavoro aggiornato con successo."
     else
+      set_job_with_associations
       render :edit, status: :unprocessable_entity
     end
   end
@@ -50,6 +52,10 @@ class JobsController < ApplicationController
 
   private
     def set_job
+      @job = Job.find(params[:id])
+    end
+
+    def set_job_with_associations
       @job = Job.includes(:locations, participations: :contact).find(params[:id])
     end
 

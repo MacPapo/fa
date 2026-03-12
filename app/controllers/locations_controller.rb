@@ -9,7 +9,10 @@ class LocationsController < ApplicationController
   end
 
   def show
-    @jobs = @location.jobs.order(date: :desc)
+    @total_location_jobs = @location.jobs.count
+    @jobs = JobQuery.new(@location.jobs, params).resolve
+
+    @pagy, @jobs = pagy(@jobs)
   end
 
   def new
