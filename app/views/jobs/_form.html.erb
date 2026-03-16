@@ -1,15 +1,5 @@
 <%= form_with(model: job, class: "flex flex-col gap-4") do |form| %>
-
-  <% if job.errors.any? %>
-    <div role="alert" class="alert alert-error">
-      <span><%= pluralize(job.errors.count, "errore impedisce", "errori impediscono") %> il salvataggio:</span>
-      <ul>
-        <% job.errors.each do |error| %>
-          <li>- <%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/form_errors", object: job %>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Descrizione (Brogliaccio) *</legend>
@@ -43,43 +33,29 @@
     </label>
   </fieldset>
 
-  <%= render "shared/job_location_builder",
+  <%= render "job_locations/builder",
              form: form,
              label: "Tappe / Locations",
-             search_url: locations_searches_path,
-             modal_id: "new_location_modal",
-             target_list_id: "locations_list_target",
-             input_id: "modal_location_name" %>
+             event_name: "location:created",
+             autocomplete_event: "location:selected" %>
 
-  <%= render "shared/participation_builder",
+  <%= render "participations/builder",
              form: form,
              role: Participation::ROLES[:photographer],
              label: "Fotografi Assegnati",
-             search_url: contacts_searches_path,
-             participations: job.participations.select { |p| p.role == Participation::ROLES[:photographer] },
-             modal_id: "new_photographer_modal",
-             target_list_id: "photographers_list_target",
-             input_id: "modal_photographer_name" %>
+             target_list_id: "photographers_list_target" %>
 
-  <%= render "shared/participation_builder",
+  <%= render "participations/builder",
              form: form,
              role: Participation::ROLES[:client],
              label: "Clienti",
-             search_url: contacts_searches_path,
-             participations: job.participations.select { |p| p.role == Participation::ROLES[:client] },
-             modal_id: "new_client_modal",
-             target_list_id: "clients_list_target",
-             input_id: "modal_client_name" %>
+             target_list_id: "clients_list_target" %>
 
-  <%= render "shared/participation_builder",
+  <%= render "participations/builder",
              form: form,
              role: Participation::ROLES[:subject],
              label: "Soggetti",
-             search_url: contacts_searches_path,
-             participations: job.participations.select { |p| p.role == Participation::ROLES[:subject] },
-             modal_id: "new_subject_modal",
-             target_list_id: "subjects_list_target",
-             input_id: "modal_subject_name" %>
+             target_list_id: "subjects_list_target" %>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Location (Legacy)</legend>
@@ -100,39 +76,4 @@
     <%= form.submit "Salva Lavoro", class: "btn btn-primary" %>
   </div>
 
-<% end %>
-
-<%= render layout: "shared/modal", locals: { id: "new_location_modal", title: "Nuova Location" } do %>
-  <%= render "locations/form",
-             location: Location.new,
-             modal_id: "new_location_modal",
-             target_list_id: "locations_list_target",
-             role: "location" %>
-<% end %>
-
-<%= render layout: "shared/modal", locals: { id: "new_photographer_modal", title: "Nuovo Fotografo" } do %>
-  <%= render "contacts/form",
-             contact: Contact.new(kind: :person),
-             url: contacts_path,
-             modal_id: "new_photographer_modal",
-             target_list_id: "photographers_list_target",
-             role: Participation::ROLES[:photographer] %>
-<% end %>
-
-<%= render layout: "shared/modal", locals: { id: "new_client_modal", title: "Nuovo Cliente" } do %>
-  <%= render "contacts/form",
-             contact: Contact.new(kind: :company),
-             url: contacts_path,
-             modal_id: "new_client_modal",
-             target_list_id: "clients_list_target",
-             role: Participation::ROLES[:client] %>
-<% end %>
-
-<%= render layout: "shared/modal", locals: { id: "new_subject_modal", title: "Nuovo Soggetto" } do %>
-  <%= render "contacts/form",
-             contact: Contact.new(kind: :person),
-             url: contacts_path,
-             modal_id: "new_subject_modal",
-             target_list_id: "subjects_list_target",
-             role: Participation::ROLES[:subject] %>
 <% end %>

@@ -1,75 +1,94 @@
+// app/javascript/controllers/multi_autocomplete_controller.js
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="multi-autocomplete"
 export default class extends Controller {
     static targets = ["input", "selectedContainer", "badgeTemplate"]
 
     connect() {
-	this.handleModalSuccess = this.handleModalSuccess.bind(this)
-	window.addEventListener("modal:success", this.handleModalSuccess)
+	// Leghiamo il listener all'evento globale
+	this.boundResetAfterCreate = this.resetAfterCreate.bind(this)
+	window.addEventListener("modal:success", this.boundResetAfterCreate)
     }
 
     disconnect() {
-	window.removeEventListener("modal:success", this.handleModalSuccess)
+	window.removeEventListener("modal:success", this.boundResetAfterCreate)
     }
 
-    handleModalSuccess(event) {
-	if (event.detail.modalId === this.element.dataset.modalId) {
-	    this.inputTarget.value = ""
+    resetAfterCreate() {
+	// Se l'input non è nel DOM, ignoriamo
+	if (!this.hasInputTarget) return
+
+	this.inputTarget.value = ""
+	const frame = this.element.querySelector("turbo-frame")
+	if (frame) {
+	    frame.innerHTML = ""
+	    frame.removeAttribute("src")
 	}
+	// UX: rimette il focus sull'input per inserire subito un altro contatto!
+	this.inputTarget.focus()
     }
 
     select(event) {
-	event.preventDefault()
+        event.preventDefault()
 
-	const id = event.currentTarget.dataset.id
-	const name = event.currentTarget.dataset.name
-	const uniqueKey = new Date().getTime()
+        const id = event.currentTarget.dataset.id
+        const name = event.currentTarget.dataset.name
+        const uniqueKey = new Date().getTime()
 
-	let templateHtml = this.badgeTemplateTarget.innerHTML
-	templateHtml = templateHtml.replace(/NEW_RECORD/g, uniqueKey)
-	templateHtml = templateHtml.replace(/TEMPLATE_ID/g, id)
-	templateHtml = templateHtml.replace(/TEMPLATE_NAME/g, name)
+        let templateHtml = this.badgeTemplateTarget.innerHTML
+        templateHtml = templateHtml.replace(/NEW_RECORD/g, uniqueKey)
+        templateHtml = templateHtml.replace(/TEMPLATE_ID/g, id)
+        templateHtml = templateHtml.replace(/TEMPLATE_NAME/g, name)
 
-	this.selectedContainerTarget.insertAdjacentHTML('beforeend', templateHtml)
+        this.selectedContainerTarget.insertAdjacentHTML('beforeend', templateHtml)
 
-	// Resetta
-	this.inputTarget.value = ""
-	const frame = this.element.querySelector("turbo-frame")
-	if (frame) frame.innerHTML = ""
+        // Resetta l'input per la prossima ricerca
+        this.inputTarget.value = ""
+
+        // Svuota e disconnette il frame dei risultati per nascondere il menu
+        const frame = this.element.querySelector("turbo-frame")
+        if (frame) {
+            frame.innerHTML = ""
+            frame.removeAttribute("src")
+        }
+
+        // UX: Gestione intelligente del Focus
+        // Se l'evento è un click del mouse reale (pointerType === "mouse"), chiudiamo il menu togliendo il focus.
+        // Se è stato innescato via codice (tastiera), manteniamo il focus per inserimenti multipli veloci.
+        // Nota: se il pointerType non è supportato, di default facciamo focus.
+        if (event.pointerType === "mouse" || event.pointerType === "touch") {
+            this.inputTarget.blur()
+
+            // Hack opzionale per DaisyUI: forza la chiusura chiudendo il details se usi <details class="dropdown">
+            const dropdown = this.element.closest('.dropdown');
+            if(dropdown && dropdown.tagName === 'DETAILS') {
+                dropdown.removeAttribute('open');
+            }
+        } else {
+            // Manteniamo il focus sull'input per far riapparire il dropdown vuoto o pronto per digitare
+            this.inputTarget.focus()
+        }
     }
 
     removeRow(event) {
-	event.preventDefault()
-	const row = event.currentTarget.closest('.participation-row') || event.currentTarget.closest('.badge')
-	if (!row) return
+        event.preventDefault()
+        const row = event.currentTarget.closest('.participation-row') || event.currentTarget.closest('.badge')
+        if (!row) return
 
-	const destroyFlag = row.querySelector('.destroy-flag')
+        const destroyFlag = row.querySelector('.destroy-flag')
 
-	if (destroyFlag) {
-	    destroyFlag.value = "1"
-	    row.style.display = 'none'
-	} else {
-	    row.remove()
-	}
+        if (destroyFlag) {
+            destroyFlag.value = "1"
+            row.style.display = 'none'
+        } else {
+            row.remove()
+        }
     }
 
-    openModal(event) {
-	event.preventDefault()
-
-	const modalId = this.element.dataset.modalId
-	const inputId = this.element.dataset.inputId
-	const currentQuery = this.inputTarget.value
-
-	const modal = document.getElementById(modalId)
-	const nameInput = document.getElementById(inputId)
-
-	if (modal) {
-	    if (nameInput) nameInput.value = currentQuery
-	    modal.showModal()
-
-	    const frame = this.element.querySelector("turbo-frame")
-	    if (frame) frame.innerHTML = ""
+    clearInput() {
+	if (this.hasInputTarget) {
+	    this.inputTarget.value = ""
+	    this.inputTarget.dispatchEvent(new Event("input"))
 	}
     }
 }

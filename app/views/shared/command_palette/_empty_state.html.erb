@@ -1,0 +1,9 @@
+<%# app/views/shared/command_palette/_empty_state.html.erb %>
+<%# Variables: query %>
+
+<div class="px-4 py-8 text-center flex flex-col items-center gap-2">
+  <span class="text-base-content/30"><%= icon("search", classes: "size-8") %></span>
+  <span class="text-sm text-base-content/60">
+    Nessun risultato per "<strong class="text-base-content"><%= query %></strong>"
+  </span>
+</div>

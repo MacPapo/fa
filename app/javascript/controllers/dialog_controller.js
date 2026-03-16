@@ -1,26 +1,25 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="dialog"
 export default class extends Controller {
-	connect() {
-		if (document.documentElement.hasAttribute("data-turbo-preview")) return
 
-		this.element.showModal()
+    connect() {
+	if (document.documentElement.hasAttribute("data-turbo-preview")) return
 
-		this.boundRemove = this.remove.bind(this)
-		document.addEventListener("turbo:before-cache", this.boundRemove)
-	}
+	this.element.showModal()
 
-	disconnect() {
-		document.removeEventListener("turbo:before-cache", this.boundRemove)
-	}
+	document.addEventListener(
+	    "turbo:before-cache",
+	    () => this.element.remove(),
+	    { once: true }
+	)
+    }
 
-	close(event) {
-		if (event) event.preventDefault()
-		this.element.close()
-	}
+    close() {
+	this.element.close()
+    }
 
-	remove() {
-		this.element.remove()
-	}
+    clickOutside(event) {
+	if (event.target === this.element) this.close()
+    }
+
 }

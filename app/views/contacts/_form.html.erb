@@ -1,12 +1,9 @@
+<% form_url = local_assigns.fetch(:submit_url, contacts_path) %>
+
 <%= form_with(
   model: contact,
-  url: local_assigns[:url],
-  id: "#{local_assigns[:modal_id]}_form",
-  class: "flex flex-col gap-4",
-  data: {
-    controller: "contact-form",
-    turbo_frame: "_top"
-  }
+  url: form_url,
+  data: { controller: "contact-form" }
 ) do |form| %>
 
   <% if local_assigns[:modal_id].present? %>

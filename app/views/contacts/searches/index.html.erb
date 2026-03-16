@@ -1,26 +1,33 @@
-<%= render layout: "layouts/autocomplete_results", locals: {
-  query: params[:query],
-  js_controller: "multi-autocomplete",
-  frame_id: params[:frame_id]
-} do %>
+<%# Definiamo il footer specifico per i Contatti %>
+<% content_for :command_palette_footer do %>
+  <%= link_to new_jobs_contact_path(name: params[:query], role: params[:role]),
+              data: { turbo_frame: "modal" },
+              class: "flex items-center gap-1.5 hover:text-primary transition-colors font-medium" do %>
+    <%= icon("plus", classes: "size-4") %>
+    <span>Crea "<span class="text-base-content font-semibold truncate max-w-[150px] inline-block align-bottom"><%= params[:query] %></span>"</span>
+  <% end %>
+<% end %>
+
+<%# Invochiamo il contenitore principale %>
+<%= render layout: "shared/command_palette/container", locals: { frame_id: params[:frame_id] } do %>
 
   <% if @contacts.any? %>
-    <% @contacts.each do |contact| %>
-      <li>
-        <a class="cursor-pointer active:bg-base-300 active:text-base-content focus:bg-base-200"
-           data-action="click->multi-autocomplete#select"
-           data-id="<%= contact.id %>"
-           data-name="<%= contact.display_name %>">
-          <%= contact.display_name %>
-        </a>
-      </li>
+    <%= render layout: "shared/command_palette/group", locals: { title: "Contatti Trovati" } do %>
+      <% @contacts.each do |contact| %>
+        <%= render "shared/command_palette/item",
+                   stimulus_data: {
+                     action: "click->multi-autocomplete#select",
+                     id: contact.id,
+                     name: contact.display_name,
+                     keyboard_nav_target: "item"
+                   },
+                   icon_name: "contacts",
+                   main_text: contact.display_name,
+                   sub_text: contact.company_name.presence || "Privato" %>
+      <% end %>
     <% end %>
   <% else %>
-    <li>
-      <span class="text-base-content/50 italic cursor-default pointer-events-none">
-        Nessun contatto trovato
-      </span>
-    </li>
+    <%= render "shared/command_palette/empty_state", query: params[:query] %>
   <% end %>
 
 <% end %>

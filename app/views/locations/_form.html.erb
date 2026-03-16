@@ -1,42 +1,53 @@
+<% form_url = local_assigns.fetch(:submit_url, locations_path) %>
+
 <%= form_with(
   model: location,
-  id: "#{local_assigns[:modal_id]}_form",
-  class: "flex flex-col gap-4",
-  data: { turbo_frame: "_top" }
-) do |form| %>
+  url: form_url
+) do |f| %>
+  <%= render "shared/form_errors", object: location %>
 
-  <%# --- Campi nascosti per il routing del modale --- %>
-  <% if local_assigns[:modal_id].present? %>
-    <%= hidden_field_tag :modal_id, local_assigns[:modal_id] %>
-    <%= hidden_field_tag :target_list_id, local_assigns[:target_list_id] %>
+  <% if params[:target_list_id].present? %>
+    <%= hidden_field_tag :target_list_id, params[:target_list_id] %>
   <% end %>
 
-  <%# --- Gestione Errori --- %>
-  <% if location.errors.any? %>
-    <div role="alert" class="alert alert-error">
-      <span><%= pluralize(location.errors.count, "errore impedisce", "errori impediscono") %> il salvataggio:</span>
-      <ul>
-        <% location.errors.each do |error| %>
-          <li>- <%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <%# --- Campi Location (Allineati allo Schema DB) --- %>
+  <!-- Begin Name -->
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Nome Location *</legend>
-    <%= form.text_field :name, class: "input w-full", id: local_assigns[:input_id] %>
-  </fieldset>
 
+    <legend class="fieldset-legend">Nome Posizione *</legend>
+
+    <%= f.text_field :name,
+     class: "input w-full",
+     id: local_assigns[:input_id],
+     placeholder: "Piazza San Marco" %>
+
+  </fieldset>
+  <!-- End Name -->
+
+  <!-- Begin District -->
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Provincia / Zona (District)</legend>
-    <%= form.text_field :district, class: "input w-full" %>
-  </fieldset>
 
-  <%# --- Azioni Form --- %>
-  <div class="mt-6">
-    <%= form.submit "Salva Location", class: "btn btn-primary w-full sm:w-auto" %>
+    <legend class="fieldset-legend">Zona / Sestiere</legend>
+
+    <%= f.text_field :district,
+     class: "input w-full",
+     placeholder: "San Marco" %>
+
+  </fieldset>
+  <!-- End District -->
+
+  <!-- Begin Actions -->
+  <div class="modal-action">
+
+    <%= f.submit "Salva", class: "btn btn-primary" %>
+
+    <button
+      type="button"
+      class="btn"
+      data-action="dialog#close">
+      Chiudi
+    </button>
+
   </div>
+  <!-- End Actions -->
 
 <% end %>

@@ -1,0 +1,26 @@
+<%# app/views/participations/_row.html.erb %>
+<% contact = form.object.contact %>
+
+<div class="flex items-center gap-2 p-2 bg-base-200 rounded-box border border-base-300 participation-row"
+     data-nested-target="row">
+
+  <%= form.hidden_field :_destroy, data: { nested_target: "destroy" }, class: "destroy-flag" %>
+  <%= form.hidden_field :role %>
+
+  <%# IL BIVIO: Template vs Dati Veri %>
+  <% if local_assigns[:template] %>
+    <%= form.hidden_field :contact_id, value: "TEMPLATE_ID", data: { nested_target: "id" } %>
+    <div class="font-bold flex-1 truncate" data-nested-target="name">TEMPLATE_NAME</div>
+  <% else %>
+    <%= form.hidden_field :contact_id, data: { nested_target: "id" } %>
+    <div class="font-bold flex-1 truncate" data-nested-target="name"><%= contact&.display_name %></div>
+  <% end %>
+
+  <div class="flex-2">
+    <%= form.text_field :title, class: "input input-sm w-full", placeholder: "Titolo/Note (es. Assistente, Sposa...)" %>
+  </div>
+
+  <button type="button" class="btn btn-sm btn-ghost text-error" data-action="nested-form#remove">
+    <%= icon("close", classes: "size-4") %>
+  </button>
+</div>

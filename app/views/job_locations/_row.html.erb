@@ -1,0 +1,31 @@
+<%# app/views/job_locations/_row.html.erb %>
+<% location = form.object.location %>
+
+<div class="flex items-center gap-2 p-2 bg-base-200 rounded-box border border-base-300 job-location-row"
+     data-nested-target="row">
+
+  <%# 1. HANDLE PER IL DRAG %>
+  <div class="sortable-handle cursor-grab active:cursor-grabbing p-1 text-base-content/30 hover:text-primary">
+    <%= icon("drag", classes: "size-4") %>
+  </div>
+
+  <%# 2. CAMPI HIDDEN %>
+  <%= form.hidden_field :_destroy, data: { nested_target: "destroy" }, class: "destroy-flag" %>
+  <%= form.hidden_field :position, class: "position-input" %>
+
+  <% if local_assigns[:template] %>
+    <%= form.hidden_field :location_id, value: "TEMPLATE_ID", data: { nested_target: "id" } %>
+    <div class="font-bold flex-1 truncate" data-nested-target="name">TEMPLATE_NAME</div>
+  <% else %>
+    <%= form.hidden_field :location_id, data: { nested_target: "id" } %>
+    <div class="font-bold flex-1 truncate" data-nested-target="name"><%= location&.display_name %></div>
+  <% end %>
+
+  <div class="flex-2"> <%# Ho messo flex-2 per dare più spazio alle note %>
+    <%= form.text_field :note, class: "input input-sm w-full", placeholder: "Note (es. Ritrovo alle 10:00)" %>
+  </div>
+
+  <button type="button" class="btn btn-sm btn-ghost text-error" data-action="nested-form#remove">
+    <%= icon("close", classes: "size-4") %>
+  </button>
+</div>

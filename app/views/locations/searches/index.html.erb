@@ -1,26 +1,34 @@
-<%= render layout: "layouts/autocomplete_results", locals: {
-  query: params[:query],
-  js_controller: "multi-autocomplete",
-  frame_id: params[:frame_id]
-} do %>
+<%# app/views/locations/searches/index.html.erb %>
+
+<% content_for :command_palette_footer do %>
+  <%= link_to new_jobs_location_path(name: params[:query], target_list_id: params[:target_list_id]),
+              data: { turbo_frame: "modal" },
+              class: "flex items-center gap-1.5 hover:text-primary transition-colors font-medium" do %>
+    <%= icon("plus", classes: "size-4") %>
+    <span>Crea "<span class="text-base-content font-semibold truncate max-w-[150px] inline-block align-bottom"><%= params[:query] %></span>"</span>
+  <% end %>
+<% end %>
+
+<%# Invochiamo il contenitore principale %>
+<%= render layout: "shared/command_palette/container", locals: { frame_id: params[:frame_id] } do %>
 
   <% if @locations.any? %>
-    <% @locations.each do |location| %>
-      <li>
-        <a class="cursor-pointer active:bg-base-300 active:text-base-content focus:bg-base-200"
-           data-action="click->multi-autocomplete#select"
-           data-id="<%= location.id %>"
-           data-name="<%= location.name %>">
-          <%= location.name %>
-        </a>
-      </li>
+    <%= render layout: "shared/command_palette/group", locals: { title: "Posizioni Trovate" } do %>
+      <% @locations.each do |location| %>
+        <%= render "shared/command_palette/item",
+                   stimulus_data: {
+                     action: "click->multi-autocomplete#select",
+                     id: location.id,
+                     name: location.display_name,
+                     keyboard_nav_target: "item"
+                   },
+                   icon_name: "location",
+                   main_text: location.display_name,
+                   sub_text: location.district %>
+      <% end %>
     <% end %>
   <% else %>
-    <li>
-      <span class="text-base-content/50 italic cursor-default pointer-events-none">
-        Nessuna location trovata
-      </span>
-    </li>
+    <%= render "shared/command_palette/empty_state", query: params[:query] %>
   <% end %>
 
 <% end %>

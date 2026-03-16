@@ -1,76 +1,51 @@
 <%= turbo_frame_tag "omnibox_results" do %>
   <% if @query.length >= 2 %>
-    <div class="py-2 flex flex-col gap-4">
+    <div class="py-2 flex flex-col max-h-[60vh] overflow-y-auto overscroll-contain">
 
       <%# --- SEZIONE CONTATTI --- %>
       <% if @contacts.any? %>
-        <div>
-          <div class="px-4 pb-2 text-xs font-semibold text-base-content/50 uppercase tracking-widest flex items-center gap-2">
-            <%= icon("contacts", classes: "w-4 h-4") %> Contatti
-          </div>
-          <div class="px-2 flex flex-col gap-1">
-            <% @contacts.each do |contact| %>
-              <%# FONDAMENTALE: data-omnibox-target="item" e turbo_frame: "_top" %>
-              <%= link_to contact_path(contact), class: "flex items-center justify-between p-3 rounded-xl border border-transparent hover:bg-base-200 hover:border-base-300 transition-all cursor-pointer group", data: { omnibox_target: "item", turbo_frame: "_top" } do %>
-                <div class="flex flex-col">
-                  <span class="font-semibold text-base-content group-hover:text-primary transition-colors"><%= contact.display_name %></span>
-                  <span class="text-xs text-base-content/60"><%= contact.company_name.presence || "Privato" %></span>
-                </div>
-                <div class="badge badge-ghost badge-sm"><%= contact.kind == 1 ? "Azienda" : "Persona" %></div>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
+        <%= render layout: "shared/command_palette/group", locals: { title: "Contatti", icon_name: "contacts" } do %>
+          <% @contacts.each do |contact| %>
+            <%= render "shared/command_palette/item",
+                       url: contact_path(contact),
+                       stimulus_data: { keyboard_nav_target: "item", turbo_frame: "_top" },
+                       main_text: contact.display_name,
+                       sub_text: contact.company_name.presence || "Privato",
+                       badge: content_tag(:div, contact.kind == 1 ? "Azienda" : "Persona", class: "badge badge-ghost badge-sm") %>
+          <% end %>
+        <% end %>
       <% end %>
 
       <%# --- SEZIONE LOCATION --- %>
       <% if @locations.any? %>
-        <div>
-          <div class="px-4 pb-2 text-xs font-semibold text-base-content/50 uppercase tracking-widest flex items-center gap-2">
-            <%= icon("locations", classes: "w-4 h-4") %> Posizioni
-          </div>
-          <div class="px-2 flex flex-col gap-1">
-            <% @locations.each do |location| %>
-              <%= link_to location_path(location), class: "flex items-center justify-between p-3 rounded-xl border border-transparent hover:bg-base-200 hover:border-base-300 transition-all cursor-pointer group", data: { omnibox_target: "item", turbo_frame: "_top" } do %>
-                <span class="font-medium text-base-content group-hover:text-primary transition-colors"><%= location.name %></span>
-                <% if location.district.present? %>
-                  <span class="text-xs text-base-content/50"><%= location.district %></span>
-                <% end %>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
+        <%= render layout: "shared/command_palette/group", locals: { title: "Posizioni", icon_name: "locations" } do %>
+          <% @locations.each do |location| %>
+            <%= render "shared/command_palette/item",
+                       url: location_path(location),
+                       stimulus_data: { keyboard_nav_target: "item", turbo_frame: "_top" },
+                       main_text: location.name,
+                       sub_text: location.district %>
+          <% end %>
+        <% end %>
       <% end %>
 
       <%# --- SEZIONE LAVORI --- %>
       <% if @jobs.any? %>
-        <div>
-          <div class="px-4 pb-2 text-xs font-semibold text-base-content/50 uppercase tracking-widest flex items-center gap-2">
-            <%= icon("calendar", classes: "w-4 h-4") %> Lavori & Servizi
-          </div>
-          <div class="px-2 flex flex-col gap-1">
-            <% @jobs.each do |job| %>
-              <%= link_to job_path(job), class: "flex items-center justify-between p-3 rounded-xl border border-transparent hover:bg-base-200 hover:border-base-300 transition-all cursor-pointer group", data: { omnibox_target: "item", turbo_frame: "_top" } do %>
-                <div class="flex flex-col">
-                  <span class="font-semibold text-base-content group-hover:text-primary transition-colors truncate max-w-lg"><%= job.display_title %></span>
-                  <span class="text-xs text-base-content/60"><%= job.display_location.presence || "Nessuna posizione" %></span>
-                </div>
-                <div class="text-xs font-mono bg-base-200 px-2 py-1 rounded-md text-base-content/70">
-                  <%= job.date.strftime("%d/%m/%Y") %>
-                </div>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
+        <%= render layout: "shared/command_palette/group", locals: { title: "Lavori & Servizi", icon_name: "calendar" } do %>
+          <% @jobs.each do |job| %>
+            <%= render "shared/command_palette/item",
+                       url: job_path(job),
+                       stimulus_data: { keyboard_nav_target: "item", turbo_frame: "_top" },
+                       main_text: job.display_title,
+                       sub_text: job.display_location.presence || "Nessuna posizione",
+                       badge: content_tag(:div, job.date.strftime("%d/%m/%Y"), class: "text-xs font-mono bg-base-200 px-2 py-1 rounded-md text-base-content/70") %>
+          <% end %>
+        <% end %>
       <% end %>
 
       <%# --- NESSUN RISULTATO --- %>
       <% if @contacts.empty? && @locations.empty? && @jobs.empty? %>
-        <div class="p-12 flex flex-col items-center justify-center text-center text-base-content/50 mt-4">
-          <div class="text-4xl mb-3">📭</div>
-          <p class="text-lg font-medium text-base-content">Nessun risultato trovato</p>
-          <p class="text-sm mt-1">Non abbiamo trovato nulla per "<span class="font-semibold text-base-content"><%= @query %></span>".</p>
-        </div>
+        <%= render "shared/command_palette/empty_state", query: @query %>
       <% end %>
 
     </div>

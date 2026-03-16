@@ -1,0 +1,38 @@
+<%# app/views/shared/command_palette/_item.html.erb %>
+<%# Variables: url (optional), stimulus_data (optional), main_text, sub_text, badge (optional), icon_name (optional) %>
+
+<% html_options = {
+  class: "flex items-center justify-between px-3 py-2 rounded-lg text-sm text-base-content hover:bg-base-200 focus:bg-base-200 focus:outline-none transition-colors group",
+  data: local_assigns[:stimulus_data] || {}
+} %>
+
+<% content = capture do %>
+  <div class="flex items-center gap-3 min-w-0">
+    <% if local_assigns[:icon_name] %>
+      <div class="flex items-center justify-center w-6 h-6 rounded bg-base-300 text-base-content/50 shrink-0">
+        <%= icon(icon_name, classes: "size-3") %>
+      </div>
+    <% end %>
+
+    <div class="flex flex-col min-w-0 truncate">
+      <span class="font-medium truncate group-hover:text-primary transition-colors"><%= main_text %></span>
+      <% if local_assigns[:sub_text].present? %>
+        <span class="text-[11px] text-base-content/50 truncate leading-tight"><%= sub_text %></span>
+      <% end %>
+    </div>
+  </div>
+
+  <% if local_assigns[:badge].present? %>
+    <div class="shrink-0 ml-2">
+      <%= badge %>
+    </div>
+  <% end %>
+<% end %>
+
+<li class="list-none">
+  <% if local_assigns[:url] %>
+    <%= link_to content, url, html_options %>
+  <% else %>
+    <%= content_tag :a, content, html_options.merge(href: "#") %>
+  <% end %>
+</li>

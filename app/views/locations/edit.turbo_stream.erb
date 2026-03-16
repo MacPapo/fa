@@ -1,0 +1,9 @@
+<%= turbo_stream.replace "modal" do %>
+
+  <%= turbo_frame_tag "modal" do %>
+    <%= render layout: "shared/modal", locals: { title: "Modifica Posizione", icon_name: "location" } do %>
+      <%= render "form", location: @location %>
+    <% end %>
+  <% end %>
+
+<% end %>

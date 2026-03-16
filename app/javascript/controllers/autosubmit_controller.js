@@ -11,32 +11,38 @@ export default class extends Controller {
         this.submitHandler()
     }
 
-    // Blocchiamo il tasto Invio per non far inviare il form principale del Job
     prevent(event) {
         event.preventDefault()
     }
 
     submitHandler() {
-        // Comportamento legacy: se è attaccato a un form, fai il submit classico
         if (this.element.tagName === "FORM") {
             this.element.requestSubmit()
             return
         }
 
-        // Nuovo comportamento: se è attaccato a un input (No form nidificati!)
         const input = this.element
         const frameId = input.dataset.frameId
         const urlString = input.dataset.url
+        const query = input.value.trim()
 
         if (!frameId || !urlString) return
 
-        // Costruiamo l'URL di ricerca
+        const frame = document.getElementById(frameId)
+
+        if (query.length < 2) {
+            if (frame) {
+                frame.innerHTML = ""
+                frame.removeAttribute("src")
+            }
+            return
+        }
+
+        // URL parsing corretto
         const url = new URL(urlString, window.location.origin)
-        url.searchParams.set("query", input.value)
+        url.searchParams.set("query", query)
         url.searchParams.set("frame_id", frameId)
 
-        // Troviamo il frame e gli iniettiamo l'URL. Turbo farà la magia!
-        const frame = document.getElementById(frameId)
         if (frame) {
             frame.src = url.toString()
         }

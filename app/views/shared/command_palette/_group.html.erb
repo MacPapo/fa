@@ -1,0 +1,14 @@
+<%# app/views/shared/command_palette/_group.html.erb %>
+<%# Variables: title (optional), icon_name (optional) %>
+
+<div class="mb-2 last:mb-0">
+  <% if local_assigns[:title].present? %>
+    <div class="px-3 pb-2 pt-1 text-[11px] font-semibold tracking-wider uppercase text-base-content/40 flex items-center gap-2">
+      <%= icon(icon_name, classes: "size-3") if local_assigns[:icon_name] %>
+      <%= title %>
+    </div>
+  <% end %>
+  <ul class="px-2 flex flex-col gap-1">
+    <%= yield %>
+  </ul>
+</div>

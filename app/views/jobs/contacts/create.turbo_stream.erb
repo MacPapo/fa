@@ -1,0 +1,6 @@
+<%= turbo_stream.update "modal", "" %>
+
+<turbo-stream action="trigger_event"
+              name="contact:created:<%= @role %>"
+              detail="<%= { id: @contact.id, name: @contact.display_name }.to_json %>">
+</turbo-stream>

@@ -1,0 +1,26 @@
+<%= turbo_frame_tag "modal" do %>
+
+  <dialog
+    class="modal modal-bottom sm:modal-middle"
+    data-controller="dialog"
+    data-action="click->dialog#clickOutside"
+    data-turbo-cache="false"
+  >
+
+    <div class="modal-box">
+
+      <% if content_for?(:title) %>
+        <h3 class="font-bold text-xl">
+          <%= yield :title %>
+        </h3>
+      <% end %>
+
+      <div class="mt-4">
+        <%= yield %>
+      </div>
+
+    </div>
+
+  </dialog>
+
+<% end %>

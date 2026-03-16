@@ -1,43 +1,40 @@
 import { Controller } from "@hotwired/stimulus"
 import Sortable from "sortablejs"
 
-// Connects to data-controller="sortable"
 export default class extends Controller {
-	connect() {
-		this.sortable = Sortable.create(this.element, {
-			handle: ".sortable-handle",
-			animation: 150,
-			ghostClass: "opacity-50",
-			onEnd: this.updatePositions.bind(this)
-		})
+    connect() {
+	this.sortable = Sortable.create(this.element, {
+	    handle: ".sortable-handle",
+	    animation: 150,
+	    ghostClass: "opacity-20",
+	    onEnd: () => this.updatePositions()
+	})
 
-		this.updatePositions()
+	// Importante: aggiorna se aggiungiamo nuovi elementi dal nested-form
+	this.observer = new MutationObserver(() => this.updatePositions())
+	this.observer.observe(this.element, { childList: true })
 
-		this.observer = new MutationObserver(() => {
-			this.updatePositions()
-		})
+	this.updatePositions()
+    }
 
-		this.observer.observe(this.element, { childList: true })
-	}
+    disconnect() {
+	this.sortable.destroy()
+	this.observer.disconnect()
+    }
 
-	disconnect() {
-		this.sortable.destroy()
-		this.observer.disconnect()
-	}
+    updatePositions() {
+	const rows = Array.from(this.element.children).filter(el => el.tagName !== 'TEMPLATE')
 
-	updatePositions() {
-		const positionInputs = this.element.querySelectorAll('.participation-row:not(template .participation-row) .position-input')
+	let currentPosition = 1
+	rows.forEach((row) => {
+	    const positionInput = row.querySelector('.position-input')
+	    const destroyFlag = row.querySelector('.destroy-flag')
 
-		let currentPosition = 1;
-
-		positionInputs.forEach((input) => {
-			const row = input.closest('.participation-row')
-			const destroyFlag = row.querySelector('.destroy-flag')
-
-			if (!destroyFlag || destroyFlag.value !== "1") {
-				input.value = currentPosition
-				currentPosition++
-			}
-		})
-	}
+	    // Se la riga esiste e non è segnata per la distruzione
+	    if (positionInput && (!destroyFlag || destroyFlag.value !== "1")) {
+		positionInput.value = currentPosition
+		currentPosition++
+	    }
+	})
+    }
 }

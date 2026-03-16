@@ -1,0 +1,5 @@
+<%= turbo_stream.update "modal", "" %>
+<turbo-stream action="trigger_event"
+              name="location:created"
+              detail="<%= { id: @location.id, name: @location.name }.to_json %>">
+</turbo-stream>

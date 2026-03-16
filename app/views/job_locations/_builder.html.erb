@@ -1,0 +1,48 @@
+<% frame_id = local_assigns[:wrapper_id] || "location_builder_#{SecureRandom.hex(4)}" %>
+<% target_list_id = local_assigns[:target_list_id] || "locations-list-#{SecureRandom.hex(4)}" %>
+<% search_url = local_assigns[:search_url] || locations_searches_path %>
+
+<fieldset class="fieldset"
+          data-controller="multi-autocomplete nested-form"
+          data-action="location:created@window->nested-form#addFromEvent location:created@window->multi-autocomplete#clearInput">
+
+  <legend class="fieldset-legend"><%= label %></legend>
+
+  <%# 1. LA LISTA (Dove finiscono le righe) %>
+  <div id="<%= target_list_id %>"
+       data-controller="sortable"
+       data-multi-autocomplete-target="selectedContainer"
+       data-nested-form-target="list"
+       class="flex flex-col gap-2 mb-4">
+
+    <%= form.fields_for :job_locations, form.object.job_locations.order(:position) do |jl_form| %>
+      <%= render 'job_locations/row', form: jl_form, template: false %>
+    <% end %>
+
+  </div>
+
+  <%# 2. RICERCA E DROPDOWN (Combo di autosubmit + keyboard-nav) %>
+  <div class="dropdown w-full relative" data-controller="keyboard-nav">
+    <input type="text"
+           class="input input-bordered w-full"
+           data-multi-autocomplete-target="input"
+           data-controller="autosubmit"
+           data-action="input->autosubmit#submit keydown.enter->autosubmit#prevent keydown->keyboard-nav#navigate"
+           data-url="<%= search_url %>"
+           data-frame-id="<%= frame_id %>"
+           autocomplete="off"
+           placeholder="Cerca location esistente...">
+
+    <%# Il dropdown content è un contenitore invisibile di posizionamento %>
+    <div class="dropdown-content absolute w-full z-[100] mt-1">
+      <%= turbo_frame_tag frame_id %>
+    </div>
+  </div>
+
+  <%# 3. IL TEMPLATE NASCOSTO (Condiviso) %>
+  <template data-multi-autocomplete-target="badgeTemplate" data-nested-form-target="template">
+    <%= form.fields_for :job_locations, JobLocation.new, child_index: "NEW_RECORD" do |jl_form| %>
+      <%= render 'job_locations/row', form: jl_form, template: true %>
+    <% end %>
+  </template>
+</fieldset>

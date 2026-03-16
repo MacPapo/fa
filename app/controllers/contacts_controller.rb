@@ -17,19 +17,16 @@ class ContactsController < ApplicationController
 
   def new
     @contact = Contact.new(kind: params[:kind].presence || "person")
+    render layout: "modal"
   end
 
   def create
     @contact = Contact.new(contact_params)
 
-    respond_to do |format|
-      if @contact.save
-        format.turbo_stream
-        format.html { redirect_to @contact, notice: "Contatto aggiunto alla rubrica." }
-      else
-        format.turbo_stream { render :new, status: :unprocessable_entity }
-        format.html { render :new, status: :unprocessable_entity }
-      end
+    if @contact.save
+      respond_to { |format| format.turbo_stream }
+    else
+      render :new, layout: "modal", status: :unprocessable_entity
     end
   end
 
@@ -37,10 +34,13 @@ class ContactsController < ApplicationController
   end
 
   def update
-    if @contact.update(contact_params)
-      redirect_to @contact, notice: "Scheda contatto aggiornata."
-    else
-      render :edit, status: :unprocessable_entity
+    respond_to do |format|
+      if @contact.update(contact_params)
+        format.html { redirect_to contacts_path, notice: "Contatto aggiornato." }
+      else
+        format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
+      end
     end
   end
 

@@ -43,7 +43,10 @@
     <%= button_to contact_path(contact),
 		  method: :delete,
 		  class: "btn btn-square btn-ghost btn-sm hover:text-error",
-		  data: { turbo_confirm: "Eliminare?" } do %>
+		  data: {
+		    turbo_frame: "_top",
+		    turbo_confirm: "Eliminare?"
+		  } do %>
       <%= icon("trash", classes: "size-4 opacity-50") %>
     <% end %>
   </div>

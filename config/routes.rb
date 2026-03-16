@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resource :session
+  resources :users, only: [ :show, :edit, :update ]
 
   concern :searchable do
     resources :searches, only: [ :index ]
@@ -17,9 +18,13 @@ Rails.application.routes.draw do
 
   resources :locations
   resources :contacts
-  resources :users
 
   resources :searches, only: [ :index ]
+
+  namespace :jobs do
+    resources :locations, only: [ :new, :create ]
+    resources :contacts, only: [ :new, :create ]
+  end
 
   get "up" => "rails/health#show", as: :rails_health_check
   root "jobs#index"

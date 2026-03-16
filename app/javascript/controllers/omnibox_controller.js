@@ -1,13 +1,12 @@
+// app/javascript/controllers/omnibox_controller.js
 import { Controller } from "@hotwired/stimulus";
 import { debounce } from "utils/debounce";
 
 // Connects to data-controller="omnibox"
 export default class extends Controller {
-    // Rimosso "form" dai targets!
-    static targets = ["input", "results", "skeleton", "item"];
+    static targets = ["input", "results", "skeleton"];
 
     connect() {
-        this.currentIndex = -1;
         this.performSearch = debounce(this.performSearch.bind(this), 300);
     }
 
@@ -23,7 +22,6 @@ export default class extends Controller {
     }
 
     performSearch() {
-        // Nuovo approccio: modifichiamo l'URL del Turbo Frame
         const urlString = this.inputTarget.dataset.url;
         if (!urlString) return;
 
@@ -64,53 +62,12 @@ export default class extends Controller {
         this.resetState();
     }
 
-    navigate(event) {
-        if (event.key === "ArrowDown") {
-            event.preventDefault();
-            if (!this.hasItemTarget) return;
-            this.currentIndex = Math.min(this.currentIndex + 1, this.itemTargets.length - 1);
-            this.updateSelection();
-        } else if (event.key === "ArrowUp") {
-            event.preventDefault();
-            if (!this.hasItemTarget) return;
-            this.currentIndex = Math.max(this.currentIndex - 1, 0);
-            this.updateSelection();
-        } else if (event.key === "Enter") {
-            event.preventDefault(); // Blocca l'invio per evitare comportamenti di default
-
-            if (this.hasItemTarget && this.currentIndex >= 0) {
-                const selectedItem = this.itemTargets[this.currentIndex];
-                const link = selectedItem.tagName === "A" ? selectedItem : selectedItem.querySelector("a");
-
-                if (link) {
-                    link.click();
-                    this.close();
-                }
-            }
-        }
-    }
-
-    updateSelection() {
-        this.itemTargets.forEach((item, index) => {
-            if (index === this.currentIndex) {
-                item.classList.add("bg-base-200", "border-primary");
-                item.classList.remove("border-transparent");
-                item.scrollIntoView({ block: "nearest" });
-            } else {
-                item.classList.remove("bg-base-200", "border-primary");
-                item.classList.add("border-transparent");
-            }
-        });
-    }
-
     // --- GESTIONE STATI ---
     resetState() {
-        this.currentIndex = -1;
         this.hideSkeleton();
         const frame = this.resultsTarget.querySelector("turbo-frame");
         if (frame) {
-            frame.removeAttribute("src"); // Blocca eventuali fetch in corso
-            // Ricreiamo la schermata iniziale originale
+            frame.removeAttribute("src");
             frame.innerHTML = `
               <div class="p-12 flex flex-col items-center justify-center text-center text-base-content/40 h-full mt-10">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mb-4 opacity-20">
@@ -124,7 +81,6 @@ export default class extends Controller {
 
     resultsLoaded() {
         this.hideSkeleton();
-        this.currentIndex = -1;
     }
 
     showSkeleton() {

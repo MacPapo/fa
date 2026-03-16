@@ -1,6 +1,8 @@
 class Contact < ApplicationRecord
   include FtsSearchable, Avatarable
 
+  broadcasts_refreshes          # turbo
+
   enum :kind, { person: 0, company: 1 }
 
   has_many :participations, dependent: :destroy
