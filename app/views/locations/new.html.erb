@@ -2,6 +2,6 @@
   Nuova Posizione
 <% end %>
 
-<% form_url = local_assigns.fetch(:submit_url, locations_path) %>
-
-<%= render "locations/form", location: @location, submit_url: form_url %>
+<%= render "locations/form",
+	   location: @location,
+	   submit_url: local_assigns[:submit_url] %>

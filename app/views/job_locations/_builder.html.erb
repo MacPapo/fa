@@ -6,22 +6,7 @@
           data-controller="multi-autocomplete nested-form"
           data-action="location:created@window->nested-form#addFromEvent location:created@window->multi-autocomplete#clearInput">
 
-  <legend class="fieldset-legend"><%= label %></legend>
-
-  <%# 1. LA LISTA (Dove finiscono le righe) %>
-  <div id="<%= target_list_id %>"
-       data-controller="sortable"
-       data-multi-autocomplete-target="selectedContainer"
-       data-nested-form-target="list"
-       class="flex flex-col gap-2 mb-4">
-
-    <%= form.fields_for :job_locations, form.object.job_locations.order(:position) do |jl_form| %>
-      <%= render 'job_locations/row', form: jl_form, template: false %>
-    <% end %>
-
-  </div>
-
-  <%# 2. RICERCA E DROPDOWN (Combo di autosubmit + keyboard-nav) %>
+  <%# 1. RICERCA E DROPDOWN (Combo di autosubmit + keyboard-nav) %>
   <div class="dropdown w-full relative" data-controller="keyboard-nav">
     <input type="text"
            class="input input-bordered w-full"
@@ -31,12 +16,25 @@
            data-url="<%= search_url %>"
            data-frame-id="<%= frame_id %>"
            autocomplete="off"
-           placeholder="Cerca location esistente...">
+           placeholder="Cerca posizione esistente...">
 
     <%# Il dropdown content è un contenitore invisibile di posizionamento %>
     <div class="dropdown-content absolute w-full z-[100] mt-1">
       <%= turbo_frame_tag frame_id %>
     </div>
+  </div>
+
+  <%# 2. LA LISTA (Dove finiscono le righe) %>
+  <div id="<%= target_list_id %>"
+       data-controller="sortable"
+       data-multi-autocomplete-target="selectedContainer"
+       data-nested-form-target="list"
+       class="flex flex-col gap-2 mt-4">
+
+    <%= form.fields_for :job_locations, form.object.job_locations.order(:position) do |jl_form| %>
+      <%= render 'job_locations/row', form: jl_form, template: false %>
+    <% end %>
+
   </div>
 
   <%# 3. IL TEMPLATE NASCOSTO (Condiviso) %>

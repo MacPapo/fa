@@ -23,24 +23,18 @@ class ContactsController < ApplicationController
   def create
     @contact = Contact.new(contact_params)
 
-    if @contact.save
-      respond_to { |format| format.turbo_stream }
-    else
+    unless @contact.save
       render :new, layout: "modal", status: :unprocessable_entity
     end
   end
 
   def edit
+    render layout: "modal"
   end
 
   def update
-    respond_to do |format|
-      if @contact.update(contact_params)
-        format.html { redirect_to contacts_path, notice: "Contatto aggiornato." }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.turbo_stream { render :edit, status: :unprocessable_entity }
-      end
+    unless @contact.update(contact_params)
+      render :edit, layout: "modal", status: :unprocessable_entity
     end
   end
 
@@ -57,13 +51,9 @@ class ContactsController < ApplicationController
     def contact_params
       params.require(:contact).permit(
         :kind,
-        :first_name,
-        :last_name,
+        :first_name, :last_name,
         :company_name,
-        :phone,
-        :email,
-        :vat_number,
-        :tax_id
+        :phone, :email, :vat_number, :tax_id
       )
     end
 end

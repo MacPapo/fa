@@ -1,12 +1,5 @@
-<div>
-  <h1>Modifica Lavoro (ID: <%= @job.id %>)</h1>
+<% content_for :title do %>
+  Modifica Servizio
+<% end %>
 
-  <%= render "form", job: @job %>
-
-  <br>
-
-  <div>
-    <%= link_to "Torna al Lavoro", @job %> |
-    <%= link_to "Torna alla Lista", jobs_path %>
-  </div>
-</div>
+<%= render "form", job: @job %>

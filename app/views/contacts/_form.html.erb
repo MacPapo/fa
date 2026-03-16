@@ -1,10 +1,9 @@
 <% form_url = local_assigns.fetch(:submit_url, contacts_path) %>
 
-<%= form_with(
-  model: contact,
-  url: form_url,
-  data: { controller: "contact-form" }
-) do |form| %>
+<%= form_with model: contact, url: form_url,
+              data: { controller: "contact-form" } do |f| %>
+
+  <%= render "shared/form_errors", object: contact %>
 
   <% if local_assigns[:modal_id].present? %>
     <%= hidden_field_tag :modal_id, local_assigns[:modal_id] %>
@@ -12,76 +11,92 @@
     <%= hidden_field_tag :role, local_assigns[:role] %>
   <% end %>
 
-  <%# --- Gestione Errori --- %>
-  <% if contact.errors.any? %>
-    <div role="alert" class="alert alert-error">
-      <span><%= pluralize(contact.errors.count, "errore impedisce", "errori impediscono") %> il salvataggio:</span>
-      <ul>
-        <% contact.errors.each do |error| %>
-          <li>- <%= error.full_message %></li>
-        <% end %>
-      </ul>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend text-lg font-semibold">Tipo di soggetto</legend>
+
+    <div class="flex gap-6 my-3">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.radio_button :kind, "person", class: "radio radio-primary",
+		      data: { action: "change->contact-form#toggle", contact_form_target: "personRadio" } %>
+        <span class="label-text font-medium">Persona fisica</span>
+      </label>
+
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.radio_button :kind, "company", class: "radio radio-primary",
+              data: { action: "change->contact-form#toggle", contact_form_target: "companyRadio" } %>
+        <span class="label-text font-medium">Azienda / Ente / Associazione</span>
+      </label>
     </div>
-  <% end %>
+  </fieldset>
 
-  <%# --- Selezione Tipo (Persona o Azienda) --- %>
-  <div class="flex gap-6 mb-2">
-    <label class="flex items-center gap-2 cursor-pointer">
-      <%= form.radio_button :kind, "person", class: "radio radio-primary", data: { action: "change->contact-form#toggle", contact_form_target: "personRadio" } %>
-      <span class="label-text font-bold">Persona Fisica</span>
-    </label>
-    <label class="flex items-center gap-2 cursor-pointer">
-      <%= form.radio_button :kind, "company", class: "radio radio-primary", data: { action: "change->contact-form#toggle", contact_form_target: "companyRadio" } %>
-      <span class="label-text font-bold">Azienda / Ente</span>
-    </label>
-  </div>
+  <div data-contact-form-target="personFields" class="<%= 'hidden' if contact.kind == 'company' %>">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Dati anagrafici personali</legend>
 
-  <%# --- Campi Persona (Nascosti se è Azienda) --- %>
-  <div data-contact-form-target="personFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">Nome *</legend>
-      <%= form.text_field :first_name, class: "input w-full" %>
-    </fieldset>
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">Cognome *</legend>
-      <%= form.text_field :last_name, class: "input w-full" %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :first_name, "Nome *", class: "label" %>
+          <%= f.text_field :first_name, class: "input w-full", placeholder: "Mario" %>
+        </div>
+
+        <div>
+          <%= f.label :last_name, "Cognome *", class: "label" %>
+          <%= f.text_field :last_name, class: "input w-full", placeholder: "Rossi" %>
+        </div>
+      </div>
     </fieldset>
   </div>
 
-  <%# --- Campi Azienda (Nascosti se è Persona) --- %>
-  <div data-contact-form-target="companyFields" class="hidden">
+  <div data-contact-form-target="companyFields" class="<%= 'hidden' if contact.kind == 'person' || contact.kind.blank? %>">
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Ragione Sociale *</legend>
-      <%= form.text_field :company_name, class: "input w-full" %>
+      <legend class="fieldset-legend">Ragione sociale / Denominazione *</legend>
+
+      <%= f.text_field :company_name, class: "input w-full",
+          placeholder: "Es. Rossi Srl, Comune di Milano, Studio Legale Bianchi" %>
     </fieldset>
   </div>
 
-  <%# --- Campi Condivisi (Contatti e Fiscalità) --- %>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">Email</legend>
-      <%= form.email_field :email, class: "input w-full" %>
-    </fieldset>
+  <fieldset class="fieldset mt-6">
+    <legend class="fieldset-legend">Contatti</legend>
 
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">Telefono</legend>
-      <%= form.text_field :phone, class: "input w-full" %>
-    </fieldset>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :email, "Email", class: "label" %>
+        <%= f.email_field :email, class: "input w-full", placeholder: "nome@esempio.it" %>
+      </div>
 
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">Partita IVA</legend>
-      <%= form.text_field :vat_number, class: "input w-full" %>
-    </fieldset>
+      <div>
+        <%= f.label :phone, "Telefono / Cellulare", class: "label" %>
+        <%= f.text_field :phone, class: "input w-full", placeholder: "+39 333 123 4567" %>
+      </div>
+    </div>
+  </fieldset>
 
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">Codice Fiscale</legend>
-      <%= form.text_field :tax_id, class: "input w-full" %>
-    </fieldset>
-  </div>
+  <fieldset class="fieldset mt-2">
+    <legend class="fieldset-legend">Codice fiscale / Partita IVA</legend>
 
-  <%# --- Azioni Form --- %>
-  <div class="mt-6">
-    <%= form.submit "Salva Contatto", class: "btn btn-primary w-full sm:w-auto" %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div data-contact-form-target="taxIdField">
+        <%= f.label :tax_id, "Codice Fiscale", class: "label" %>
+        <%= f.text_field :tax_id, class: "input w-full", placeholder: "RSSMRA80A01H501Z" %>
+        <p class="text-xs text-base-content/70 mt-1" data-contact-form-target="personHint">
+          Obbligatorio per persone fisiche
+        </p>
+      </div>
+
+      <div>
+        <%= f.label :vat_number, "Partita IVA", class: "label" %>
+        <%= f.text_field :vat_number, class: "input w-full", placeholder: "12345678901" %>
+        <p class="text-xs text-base-content/70 mt-1" data-contact-form-target="companyHint hidden">
+          Obbligatoria per aziende / partite IVA
+        </p>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="modal-action mt-8">
+    <%= f.submit "Salva contatto", class: "btn btn-primary" %>
+    <button type="button" class="btn" data-action="dialog#close">Annulla</button>
   </div>
 
 <% end %>

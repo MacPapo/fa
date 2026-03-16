@@ -2,6 +2,6 @@
   Nuovo Contatto
 <% end %>
 
-<% form_url = local_assigns.fetch(:submit_url, contacts_path) %>
-
-<%= render "contacts/form", contact: @contact, submit_url: form_url %>
+<%= render "contacts/form",
+	   contact: @contact,
+	   submit_url: local_assigns[:submit_url] %>

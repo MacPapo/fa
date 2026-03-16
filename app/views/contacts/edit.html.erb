@@ -1,5 +1,7 @@
-<%= turbo_frame_tag "modal" do %>
-  <%= render layout: "shared/modal", locals: { title: "Modifica Contatto", icon_name: "users" } do %>
-    <%= render "form", contact: @contact, url: contact_path(@contact) %>
-  <% end %>
+<% content_for :title do %>
+  Modifica Contatto
 <% end %>
+
+<%= render "contacts/form",
+	   contact: @contact,
+	   submit_url: local_assigns[:submit_url] %>

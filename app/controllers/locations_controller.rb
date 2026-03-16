@@ -23,24 +23,18 @@ class LocationsController < ApplicationController
   def create
     @location = Location.new(location_params)
 
-    if @location.save
-      respond_to { |format| format.turbo_stream }
-    else
+    unless @location.save
       render :new, layout: "modal", status: :unprocessable_entity
     end
   end
 
   def edit
+    render layout: "modal"
   end
 
   def update
-    respond_to do |format|
-      if @location.update(location_params)
-        format.html { redirect_to @location, notice: "Location aggiornata." }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.turbo_stream { render :edit, status: :unprocessable_entity }
-      end
+    unless @location.update(location_params)
+      render :edit, layout: "modal", status: :unprocessable_entity
     end
   end
 

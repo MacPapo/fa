@@ -16,22 +16,7 @@ solo il builder dei fotografi deve reagire e aggiungere la riga.
           data-controller="multi-autocomplete nested-form"
           data-action="<%= created_event %>@window->nested-form#addFromEvent <%= created_event %>@window->multi-autocomplete#clearInput">
 
-  <legend class="fieldset-legend"><%= label %></legend>
-
-  <%# 1. LA LISTA %>
-  <div id="<%= target_list_id %>"
-       data-multi-autocomplete-target="selectedContainer"
-       data-nested-form-target="list"
-       class="flex flex-col gap-2 mb-4">
-
-    <% role_participations = form.object.participations.select { |p| p.role == role } %>
-
-    <%= form.fields_for :participations, role_participations do |p_form| %>
-      <%= render 'participations/row', form: p_form, template: false %>
-    <% end %>
-  </div>
-
-  <%# 2. RICERCA E DROPDOWN %>
+  <%# 1. RICERCA E DROPDOWN %>
   <div class="dropdown w-full relative" data-controller="keyboard-nav">
     <input type="text"
            class="input input-bordered w-full"
@@ -41,11 +26,24 @@ solo il builder dei fotografi deve reagire e aggiungere la riga.
            data-url="<%= search_url %>"
            data-frame-id="<%= frame_id %>"
            autocomplete="off"
-           placeholder="Cerca o aggiungi <%= label.downcase %>...">
+           placeholder="Cerca contatto esistente...">
 
     <div class="dropdown-content absolute w-full z-[100] mt-1">
       <%= turbo_frame_tag frame_id %>
     </div>
+  </div>
+
+  <%# 2. LA LISTA %>
+  <div id="<%= target_list_id %>"
+       data-multi-autocomplete-target="selectedContainer"
+       data-nested-form-target="list"
+       class="flex flex-col gap-2 mt-4">
+
+    <% role_participations = form.object.participations.select { |p| p.role == role } %>
+
+    <%= form.fields_for :participations, role_participations do |p_form| %>
+      <%= render 'participations/row', form: p_form, template: false %>
+    <% end %>
   </div>
 
   <%# 3. IL TEMPLATE NASCOSTO %>

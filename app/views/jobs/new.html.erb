@@ -1,21 +1,5 @@
-<div class="max-w-4xl mx-auto py-8 px-4">
-  <div class="text-sm breadcrumbs mb-6 text-base-content/70">
-    <ul>
-      <li><%= link_to "Lista Lavori", jobs_path, class: "hover:text-primary" %></li>
-      <li class="font-semibold text-base-content">Nuovo Lavoro</li>
-    </ul>
-  </div>
+<% content_for :title do %>
+  Nuovo Servizio
+<% end %>
 
-  <div class="card bg-base-100 shadow-xl border border-base-200">
-    <div class="card-body">
-      <h1 class="card-title text-3xl mb-2">Crea un nuovo servizio</h1>
-      <p class="text-base-content/70 mb-6">Compila i dettagli per registrare un nuovo lavoro a sistema.</p>
-
-      <%= render "form", job: @job %>
-
-      <div class="mt-8 pt-6 border-t border-base-200 flex justify-start">
-        <%= link_to "Annulla e torna alla lista", jobs_path, class: "btn btn-ghost" %>
-      </div>
-    </div>
-  </div>
-</div>
+<%= render "form", job: @job %>

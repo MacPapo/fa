@@ -1,5 +1,7 @@
-<%= turbo_frame_tag "modal" do %>
-  <%= render layout: "shared/modal", locals: { title: "Modifica Posizione", icon_name: "location" } do %>
-    <%= render "form", location: @location %>
-  <% end %>
+<% content_for :title do %>
+  Modifica Posizione
 <% end %>
+
+<%= render "locations/form",
+	   location: @location,
+	   submit_url: local_assigns[:submit_url] %>

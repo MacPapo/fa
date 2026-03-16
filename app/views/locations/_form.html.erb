@@ -1,9 +1,8 @@
-<% form_url = local_assigns.fetch(:submit_url, locations_path) %>
-
 <%= form_with(
   model: location,
-  url: form_url
+  url: local_assigns[:submit_url]
 ) do |f| %>
+
   <%= render "shared/form_errors", object: location %>
 
   <% if params[:target_list_id].present? %>

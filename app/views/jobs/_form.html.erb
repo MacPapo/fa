@@ -1,79 +1,199 @@
-<%= form_with(model: job, class: "flex flex-col gap-4") do |form| %>
+<%= form_with(model: job, class: "relative text-base-content") do |form| %>
   <%= render "shared/form_errors", object: job %>
 
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Descrizione (Brogliaccio) *</legend>
-    <%= form.text_area :description, class: "textarea w-full", rows: 3 %>
-  </fieldset>
+  <%# ================= HEADER STICKY ================= %>
+  <div class="sticky top-0 z-50 w-full bg-base-100/90 backdrop-blur-md border-b border-base-200/60 py-4 mb-10 transition-all">
+    <div class="container mx-auto max-w-6xl px-4 md:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">
+          <%= job.new_record? ? "Nuovo Servizio" : "Modifica: #{job.display_title}" %>
+        </h1>
+      </div>
 
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Note Operative</legend>
-    <%= form.text_area :notes, class: "textarea w-full", rows: 2 %>
-  </fieldset>
-
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Data *</legend>
-    <%= form.date_field :date, class: "input w-full" %>
-  </fieldset>
-
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Inizio (Opzionale)</legend>
-    <%= form.datetime_field :start_at, class: "input w-full" %>
-  </fieldset>
-
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Fine (Opzionale)</legend>
-    <%= form.datetime_field :end_at, class: "input w-full" %>
-  </fieldset>
-
-  <fieldset class="fieldset">
-    <label class="flex items-center gap-2 cursor-pointer">
-      <%= form.check_box :with_video, class: "checkbox" %>
-      <span>Servizio con attrezzatura Video?</span>
-    </label>
-  </fieldset>
-
-  <%= render "job_locations/builder",
-             form: form,
-             label: "Tappe / Locations",
-             event_name: "location:created",
-             autocomplete_event: "location:selected" %>
-
-  <%= render "participations/builder",
-             form: form,
-             role: Participation::ROLES[:photographer],
-             label: "Fotografi Assegnati",
-             target_list_id: "photographers_list_target" %>
-
-  <%= render "participations/builder",
-             form: form,
-             role: Participation::ROLES[:client],
-             label: "Clienti",
-             target_list_id: "clients_list_target" %>
-
-  <%= render "participations/builder",
-             form: form,
-             role: Participation::ROLES[:subject],
-             label: "Soggetti",
-             target_list_id: "subjects_list_target" %>
-
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Location (Legacy)</legend>
-    <%= form.text_field :legacy_location_text, class: "input w-full" %>
-  </fieldset>
-
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Ora inizio (Legacy)</legend>
-    <%= form.text_field :from_time, class: "input w-full" %>
-  </fieldset>
-
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Ora fine (Legacy)</legend>
-    <%= form.text_field :to_time, class: "input w-full" %>
-  </fieldset>
-
-  <div class="mt-4">
-    <%= form.submit "Salva Lavoro", class: "btn btn-primary" %>
+      <div class="flex items-center gap-2">
+        <%= link_to "Annulla", jobs_path, class: "btn btn-sm btn-ghost font-medium text-base-content/70 hover:text-base-content" %>
+        <%= form.submit "Salva Lavoro", class: "btn btn-sm btn-primary font-medium px-6" %>
+      </div>
+    </div>
   </div>
 
+  <%# ================= LAYOUT PRINCIPALE: SIDEBAR + STACK ================= %>
+  <div class="container mx-auto max-w-6xl px-4 md:px-8 flex flex-col md:flex-row gap-12 md:gap-16 relative pb-32">
+
+    <%# --------- SIDEBAR DI NAVIGAZIONE --------- %>
+    <nav class="hidden md:block w-48 shrink-0">
+      <ul class="menu w-full p-0 gap-1 sticky top-28 text-sm font-medium">
+
+	<%# Titolo del Menu nativo di DaisyUI %>
+	<li>
+	  <h2 class="menu-title">Indice</h2>
+
+	  <%# Voci del Menu %>
+	  <ul>
+	    <li><a href="#sezione-generale">Generale</a></li>
+	    <li><a href="#sezione-logistica">Logistica & Tappe</a></li>
+	    <li><a href="#sezione-staff">Persone Coinvolte</a></li>
+	    <li><a href="#sezione-note">Note Operative</a></li>
+	    <li><a href="#sezione-legacy">Dati Storici</a></li>
+	  </ul>
+	</li>
+      </ul>
+    </nav>
+
+    <%# --------- CONTENUTO PRINCIPALE (Lo Stack) --------- %>
+    <div class="flex-1 flex flex-col gap-16 max-w-3xl">
+
+      <%# 1. SEZIONE GENERALE %>
+      <section id="sezione-generale" class="scroll-mt-32">
+
+        <header class="mb-6">
+          <h2 class="text-lg font-semibold tracking-tight">Generale</h2>
+          <p class="text-sm text-base-content/60">I dettagli fondamentali del servizio.</p>
+        </header>
+
+        <div class="flex flex-col gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <fieldset class="fieldset">
+              <%= form.label :date, "Data *", class: "label" %>
+              <%= form.date_field :date, class: "input w-full" %>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <%= form.label :start_at, "Inizio (Opzionale)", class: "label" %>
+              <%= form.datetime_field :start_at, class: "input w-full" %>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <%= form.label :end_at, "Fine (Opzionale)", class: "label" %>
+              <%= form.datetime_field :end_at, class: "input w-full" %>
+            </fieldset>
+          </div>
+
+          <fieldset class="fieldset">
+            <label class="label">
+	      <div class="grow">
+		<span class="block text-sm font-medium">Attrezzatura Video</span>
+		<span class="block text-xs text-base-content/60">Richiede operatori e strumentazione video.</span>
+	      </div>
+              <%= form.check_box :with_video, class: "toggle toggle-sm toggle-primary" %>
+            </label>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <%= form.label :description, "Brogliaccio *", class: "label" %>
+            <%= form.text_area :description,
+	     class: "textarea w-full",
+	     rows: 4,
+	     placeholder: "Descrivi le attività principali..." %>
+          </fieldset>
+        </div>
+      </section>
+
+      <div class="divider my-0 opacity-30"></div>
+
+      <%# 2. SEZIONE LOGISTICA %>
+      <section id="sezione-logistica" class="scroll-mt-32">
+        <header class="mb-6">
+          <h2 class="text-lg font-semibold tracking-tight">Logistica & Tappe</h2>
+          <p class="text-sm text-base-content/60">Dove si svolgerà il lavoro. Trascina per riordinare.</p>
+        </header>
+
+        <div class="rounded-xl border border-base-200/60 bg-base-100 p-1">
+          <%= render "job_locations/builder",
+                     form: form,
+                     event_name: "location:created",
+                     autocomplete_event: "location:selected" %>
+        </div>
+      </section>
+
+      <div class="divider my-0 opacity-30"></div>
+
+      <%# 3. SEZIONE PERSONE %>
+      <section id="sezione-staff" class="scroll-mt-32">
+
+        <header class="mb-6">
+          <h2 class="text-lg font-semibold tracking-tight">Persone Coinvolte</h2>
+          <p class="text-sm text-base-content/60">Assegna lo staff e indica i referenti.</p>
+        </header>
+
+        <div class="flex flex-col gap-8">
+	  <fieldset class="fieldset">
+            <legend class="fieldset-legend">Fotografi Assegnati</legend>
+
+            <div class="rounded-xl border border-base-200/60 p-1">
+              <%= render "participations/builder",
+                         form: form,
+                         role: Participation::ROLES[:photographer],
+                         target_list_id: "photographers_list_target" %>
+            </div>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">Clienti (Referenti Paganti)</legend>
+
+            <div class="rounded-xl border border-base-200/60 p-1">
+              <%= render "participations/builder",
+                         form: form,
+                         role: Participation::ROLES[:client],
+                         target_list_id: "clients_list_target" %>
+            </div>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">Soggetti (Festeggiati / VIP)</legend>
+
+            <div class="rounded-xl border border-base-200/60 p-1">
+              <%= render "participations/builder",
+                         form: form,
+                         role: Participation::ROLES[:subject],
+                         target_list_id: "subjects_list_target" %>
+            </div>
+          </fieldset>
+        </div>
+      </section>
+
+      <div class="divider my-0 opacity-30"></div>
+
+      <%# 4. SEZIONE NOTE %>
+      <section id="sezione-note" class="scroll-mt-32">
+
+        <header class="mb-6">
+          <h2 class="text-lg font-semibold tracking-tight">Note Operative</h2>
+        </header>
+
+        <%= form.text_area :notes,
+	 class: "textarea w-full",
+	 rows: 4,
+	 placeholder: "Aggiungi note interne o indicazioni particolari (es. Niente flash durante la cerimonia)..." %>
+      </section>
+
+      <%# 5. SEZIONE LEGACY %>
+      <section id="sezione-legacy" class="scroll-mt-32 pt-8">
+
+        <details class="collapse collapse-arrow bg-base-200/50">
+
+          <summary class="collapse-title font-semibold">Dati Storici / Legacy</summary>
+          <div class="collapse-content text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+	      <fieldset class="fieldset">
+                <%= form.label :legacy_location_text, "Location", class: "label" %>
+                <%= form.text_field :legacy_location_text, class: "input input-sm w-full" %>
+              </fieldset>
+
+              <fieldset class="fieldset">
+                <%= form.label :from_time, "Ora inizio", class: "label" %>
+                <%= form.datetime_field :from_time, class: "input input-sm w-full" %>
+              </fieldset>
+
+              <fieldset class="fieldset">
+                <%= form.label :to_time, "Ora fine", class: "label" %>
+                <%= form.datetime_field :to_time, class: "input input-sm w-full" %>
+              </fieldset>
+            </div>
+          </div>
+        </details>
+      </section>
+
+    </div>
+  </div>
 <% end %>
