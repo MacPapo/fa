@@ -70,3 +70,5 @@ end
 gem "csv", "~> 3.3"
 
 gem "pagy", "~> 43.3"
+
+gem "litestream", "~> 0.14.0"
