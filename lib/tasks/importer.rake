@@ -32,7 +32,7 @@ namespace :db do
     now = Time.current
 
     # 1. Carichiamo le locations dal CSV primario
-    filepath_locs = Rails.root.join("db", "locations", "locations.csv")
+    filepath_locs = Rails.root.join("db", "import", "locations.csv")
     if File.exist?(filepath_locs)
       CSV.foreach(filepath_locs, headers: true, encoding: "UTF-8") do |row|
         name = row["name"].to_s.strip
@@ -49,7 +49,7 @@ namespace :db do
     end
 
     # 2. Scansioniamo preventivamente le location dal file dei jobs!
-    filepath_jobs = Rails.root.join("db", "legacy_data", "legacy_jobs.csv")
+    filepath_jobs = Rails.root.join("db", "import", "legacy_jobs.csv")
     if File.exist?(filepath_jobs)
       CSV.foreach(filepath_jobs, headers: true, encoding: "UTF-8") do |row|
         name = row["location"].to_s.strip
@@ -75,7 +75,7 @@ namespace :db do
 
   def import_contacts
     puts "\n👤 2/4 - Importazione Contatti..."
-    filepath = Rails.root.join("db", "legacy_data", "legacy_contacts.csv")
+    filepath = Rails.root.join("db", "import", "legacy_contacts.csv")
     contacts_data = []
     now = Time.current
 
@@ -109,7 +109,7 @@ namespace :db do
 
   def import_jobs_and_itineraries
     puts "\n📸 3/4 - Importazione Lavori e Tappe (JobLocations)..."
-    filepath = Rails.root.join("db", "legacy_data", "legacy_jobs.csv")
+    filepath = Rails.root.join("db", "import", "legacy_jobs.csv")
 
     location_map = Location.pluck(Arel.sql("LOWER(name)"), :id).to_h
 
@@ -176,7 +176,7 @@ namespace :db do
 
   def import_participations
     puts "\n🔗 4/4 - Importazione Partecipazioni (Pivot)..."
-    filepath = Rails.root.join("db", "legacy_data", "legacy_participations.csv")
+    filepath = Rails.root.join("db", "import", "legacy_participations.csv")
 
     # Pre-carichiamo ID validi in RAM per evitare ForeignKey constraints failure
     valid_job_ids = Job.pluck(:id).to_set

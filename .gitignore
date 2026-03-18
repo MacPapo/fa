@@ -36,7 +36,4 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
-db/locations/
-db/legacy_data/
-lib/tasks/import_legacy.rake
-lib/tasks/import_locations.rake
+db/import/
