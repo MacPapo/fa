@@ -135,9 +135,16 @@ namespace :db do
 
       parsed_json["legacy_location_text"] = raw_location if raw_location.present?
 
+      # --- FIX ANTI-CRASH PER LA DATA (Fallback in caso di vecchi dati corrotti) ---
+      job_date = row["date"].to_s.strip
+      if job_date.blank?
+        created_val = row["created_at"].to_s.strip
+        job_date = created_val.present? ? created_val[0..9] : "1970-01-01"
+      end
+
       jobs_data << {
         id: row["id"].to_i, # CASTING
-        date: row["date"],
+        date: job_date,
         start_at: start_at,
         end_at: end_at,
         description: row["description"]&.strip,
