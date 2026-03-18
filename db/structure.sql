@@ -5,10 +5,6 @@ CREATE UNIQUE INDEX "index_locations_on_name_and_district" ON "locations" ("name
 CREATE INDEX "index_locations_on_name" ON "locations" ("name") /*application='Fa'*/;
 CREATE VIRTUAL TABLE locations_fts USING fts5 (name, district, content='locations', content_rowid='id')
 /* locations_fts(name,district) */;
-CREATE TABLE IF NOT EXISTS 'locations_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'locations_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'locations_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'locations_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TRIGGER locations_ai AFTER INSERT ON locations BEGIN
         INSERT INTO locations_fts(rowid, name, district)
         VALUES (new.id, new.name, new.district);
@@ -30,10 +26,6 @@ CREATE UNIQUE INDEX "index_contacts_on_tax_id" ON "contacts" ("tax_id") WHERE ta
 CREATE UNIQUE INDEX "index_contacts_on_vat_number" ON "contacts" ("vat_number") WHERE vat_number IS NOT NULL AND vat_number != '' /*application='Fa'*/;
 CREATE VIRTUAL TABLE contacts_fts USING fts5 (first_name, last_name, known_as, company_name, email, phone, vat_number, tax_id, notes, content='contacts', content_rowid='id')
 /* contacts_fts(first_name,last_name,known_as,company_name,email,phone,vat_number,tax_id,notes) */;
-CREATE TABLE IF NOT EXISTS 'contacts_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'contacts_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'contacts_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'contacts_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TRIGGER contacts_ai AFTER INSERT ON contacts BEGIN
         INSERT INTO contacts_fts(rowid, first_name, last_name, known_as, company_name, email, phone, vat_number, tax_id, notes)
         VALUES (new.id, new.first_name, new.last_name, new.known_as, new.company_name, new.email, new.phone, new.vat_number, new.tax_id, new.notes);
@@ -54,10 +46,6 @@ CREATE INDEX "index_jobs_on_date" ON "jobs" ("date") /*application='Fa'*/;
 CREATE INDEX "index_jobs_on_with_video" ON "jobs" ("with_video") /*application='Fa'*/;
 CREATE VIRTUAL TABLE jobs_fts USING fts5 (description, notes, legacy_data, content='jobs', content_rowid='id')
 /* jobs_fts(description,notes,legacy_data) */;
-CREATE TABLE IF NOT EXISTS 'jobs_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'jobs_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'jobs_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'jobs_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TRIGGER jobs_ai AFTER INSERT ON jobs BEGIN
         INSERT INTO jobs_fts(rowid, description, notes, legacy_data)
         VALUES (new.id, new.description, new.notes, new.legacy_data);
@@ -92,10 +80,6 @@ FOREIGN KEY ("user_id")
 CREATE INDEX "index_sessions_on_user_id" ON "sessions" ("user_id") /*application='Fa'*/;
 CREATE VIRTUAL TABLE participations_fts USING fts5 (title, role, content='participations', content_rowid='id')
 /* participations_fts(title,role) */;
-CREATE TABLE IF NOT EXISTS 'participations_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'participations_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'participations_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'participations_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TRIGGER participations_ai AFTER INSERT ON participations BEGIN
         INSERT INTO participations_fts(rowid, title, role)
         VALUES (new.id, new.title, new.role);
