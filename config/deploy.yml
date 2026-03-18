@@ -92,7 +92,7 @@ builder:
 
 # Use a different ssh user than root
 ssh:
-  user: app
+  user: root
   port: 2222
 
 # Use accessory services (secrets come from .kamal/secrets).
