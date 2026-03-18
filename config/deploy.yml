@@ -23,6 +23,10 @@ servers:
 proxy:
   ssl: false
   app_port: 3000
+  run:
+    publish:
+      - "8080:80"
+      - "4443:443"
 
 # Where you keep your container images.
 registry:
