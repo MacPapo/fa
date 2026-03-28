@@ -2,7 +2,7 @@
 
   <%# 1. NAVIGAZIONE (Subtle Back Link) %>
   <div class="mt-6 mb-2">
-    <%= link_to contacts_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-base-content/50 hover:text-base-content transition-colors" do %>
+    <%= link_to contacts_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-base-content/60 hover:text-base-content transition-colors" do %>
       <%= icon("chevron_left", classes: "size-4") %>
       <span>Torna alla Rubrica</span>
     <% end %>
@@ -25,7 +25,7 @@
         <div class="flex flex-col flex-1 min-w-0">
           <%# Prima Riga: Titolo e Badge %>
           <div class="flex items-center flex-wrap gap-2">
-            <h1 class="text-2xl sm:text-3xl font-bold break-words"><%= @contact.display_name %></h1>
+            <h1 class="text-2xl sm:text-3xl font-bold break-words text-base-content"><%= @contact.display_name %></h1>
             <div class="badge <%= @contact.kind == 'person' ? 'badge-primary badge-outline' : 'badge-secondary badge-outline' %> whitespace-nowrap">
               <%= @contact.kind == "person" ? "Persona Fisica" : "Azienda/Ente" %>
             </div>
@@ -40,29 +40,29 @@
 
               <% if @contact.email.present? %>
                 <div class="flex items-center gap-1.5 min-w-0">
-                  <%= icon("email", classes: "size-4 opacity-50 shrink-0") %>
-                  <span class="truncate"><%= @contact.email %></span>
+                  <%= icon("email", classes: "size-4 text-base-content/50 shrink-0") %>
+                  <span class="truncate text-base-content"><%= @contact.email %></span>
                 </div>
               <% end %>
 
               <% if @contact.phone.present? %>
                 <div class="flex items-center gap-1.5 whitespace-nowrap">
-                  <%= icon("phone", classes: "size-4 opacity-50 shrink-0") %>
-                  <span><%= @contact.phone %></span>
+                  <%= icon("phone", classes: "size-4 text-base-content/50 shrink-0") %>
+                  <span class="text-base-content"><%= @contact.phone %></span>
                 </div>
               <% end %>
 
               <% if @contact.vat_number.present? %>
                 <div class="flex items-center gap-1.5 whitespace-nowrap">
-                  <span class="text-xs font-bold uppercase tracking-wider opacity-50">P.IVA</span>
-                  <span class="font-mono"><%= @contact.vat_number %></span>
+                  <span class="text-xs font-bold uppercase tracking-wider text-base-content/50">P.IVA</span>
+                  <span class="font-mono text-base-content"><%= @contact.vat_number %></span>
                 </div>
               <% end %>
 
               <% if @contact.tax_id.present? %>
                 <div class="flex items-center gap-1.5 whitespace-nowrap">
-                  <span class="text-xs font-bold uppercase tracking-wider opacity-50">C.F.</span>
-                  <span class="font-mono"><%= @contact.tax_id %></span>
+                  <span class="text-xs font-bold uppercase tracking-wider text-base-content/50">C.F.</span>
+                  <span class="font-mono text-base-content"><%= @contact.tax_id %></span>
                 </div>
               <% end %>
 
@@ -72,15 +72,17 @@
       </div>
 
       <%# Descrizione logicamente agganciata ai dati anagrafici %>
-      <p class="text-sm text-base-content/70">
-        Dettagli anagrafici del contatto e storico di tutti i servizi in cui ha partecipato.
-      </p>
+      <div class="mt-1">
+        <p class="text-sm text-base-content/70">
+          Dettagli anagrafici del contatto e storico di tutti i servizi in cui ha partecipato.
+        </p>
+      </div>
 
     </div>
 
     <%# BLOCCO DESTRA: Azioni Contatto (A destra su desktop, a capo su mobile) %>
     <div class="flex items-center gap-2 shrink-0 pt-1">
-      <%= link_to edit_contact_path(@contact), class: "btn btn-outline btn-sm", data: { turbo_frame: "modal" } do %>
+      <%= link_to edit_contact_path(@contact), class: "btn btn-outline btn-base-300 btn-sm text-base-content/80 hover:text-base-content", data: { turbo_frame: "modal" } do %>
         <%= icon("edit", classes: "size-4") %>
         <span class="hidden sm:inline">Modifica</span>
       <% end %>
@@ -115,9 +117,9 @@
     <% if @jobs.any? %>
 
       <ul class="list bg-base-100 rounded-box shadow-md">
-        <li class="p-4 pb-2 text-xs opacity-60 tracking-wide flex justify-between items-end">
+        <li class="p-4 pb-2 text-xs text-base-content/60 tracking-wide flex justify-between items-end">
           <span>Storico Servizi</span>
-          <span class="tracking-normal"><%= @pagy.count %> voci</span>
+          <span class="tracking-normal text-base-content"><%= @pagy.count %> voci</span>
         </li>
 
         <%= render partial: "jobs/job", collection: @jobs %>
@@ -129,13 +131,13 @@
       <div class="hero bg-base-100 rounded-box shadow-md py-16">
         <div class="hero-content text-center">
           <div class="max-w-md">
-            <%= icon("camera", classes: "size-12 opacity-20 mx-auto mb-4") %>
-            <h2 class="text-xl font-bold">Nessun servizio</h2>
+            <%= icon("camera", classes: "size-12 text-base-content/20 mx-auto mb-4") %>
+            <h2 class="text-xl font-bold text-base-content">Nessun servizio</h2>
             <% if params[:query].present? %>
-              <p class="py-4 opacity-60">
-                Non abbiamo trovato nessun servizio per "<strong><%= params[:query] %></strong>" associato a questo contatto.</p>
+              <p class="py-4 text-base-content/70">
+                Non abbiamo trovato nessun servizio per "<strong class="text-base-content"><%= params[:query] %></strong>" associato a questo contatto.</p>
             <% else %>
-              <p class="py-4 opacity-60">
+              <p class="py-4 text-base-content/70">
                 Questo contatto non ha ancora partecipato a nessun servizio. Lo vedrai comparire qui quando lo aggiungerai a un servizio.</p>
             <% end %>
           </div>

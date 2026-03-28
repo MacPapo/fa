@@ -2,7 +2,7 @@
   <%= render "shared/form_errors", object: job %>
 
   <%# ================= HEADER STICKY ================= %>
-  <div class="sticky top-0 z-50 w-full bg-base-100/90 backdrop-blur-md border-b border-base-200/60 py-4 mb-10 transition-all">
+  <div class="sticky top-0 z-50 w-full bg-base-200/90 backdrop-blur-md border-b border-base-200/60 py-4 mb-10 transition-all">
     <div class="container mx-auto max-w-6xl px-4 md:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-semibold tracking-tight">
@@ -30,11 +30,10 @@
 
 	  <%# Voci del Menu %>
 	  <ul>
-	    <li><a href="#sezione-generale">Generale</a></li>
-	    <li><a href="#sezione-logistica">Logistica & Tappe</a></li>
-	    <li><a href="#sezione-staff">Persone Coinvolte</a></li>
-	    <li><a href="#sezione-note">Note Operative</a></li>
-	    <li><a href="#sezione-legacy">Dati Storici</a></li>
+	    <li><a href="#sezione-generale" data-turbo="false" class="focus:bg-base-200">Generale</a></li>
+	    <li><a href="#sezione-logistica" data-turbo="false" class="focus:bg-base-200">Logistica & Tappe</a></li>
+	    <li><a href="#sezione-staff" data-turbo="false" class="focus:bg-base-200">Persone Coinvolte</a></li>
+	    <li><a href="#sezione-note" data-turbo="false" class="focus:bg-base-200">Note & Legacy</a></li>
 	  </ul>
 	</li>
       </ul>
@@ -44,7 +43,7 @@
     <div class="flex-1 flex flex-col gap-16 max-w-3xl">
 
       <%# 1. SEZIONE GENERALE %>
-      <section id="sezione-generale" class="scroll-mt-32">
+      <section id="sezione-generale" class="scroll-mt-32 bg-base-100 p-6 md:p-8 shadow-sm">
 
         <header class="mb-6">
           <h2 class="text-lg font-semibold tracking-tight">Generale</h2>
@@ -89,27 +88,21 @@
         </div>
       </section>
 
-      <div class="divider my-0 opacity-30"></div>
-
       <%# 2. SEZIONE LOGISTICA %>
-      <section id="sezione-logistica" class="scroll-mt-32">
+      <section id="sezione-logistica" class="scroll-mt-32 bg-base-100 p-6 md:p-8 shadow-sm">
         <header class="mb-6">
           <h2 class="text-lg font-semibold tracking-tight">Logistica & Tappe</h2>
           <p class="text-sm text-base-content/60">Dove si svolgerà il lavoro. Trascina per riordinare.</p>
         </header>
 
-        <div class="rounded-xl border border-base-200/60 bg-base-100 p-1">
-          <%= render "job_locations/builder",
-                     form: form,
-                     event_name: "location:created",
-                     autocomplete_event: "location:selected" %>
-        </div>
+        <%= render "job_locations/builder",
+                   form: form,
+                   event_name: "location:created",
+                   autocomplete_event: "location:selected" %>
       </section>
 
-      <div class="divider my-0 opacity-30"></div>
-
       <%# 3. SEZIONE PERSONE %>
-      <section id="sezione-staff" class="scroll-mt-32">
+      <section id="sezione-staff" class="scroll-mt-32 bg-base-100 p-6 md:p-8 shadow-sm">
 
         <header class="mb-6">
           <h2 class="text-lg font-semibold tracking-tight">Persone Coinvolte</h2>
@@ -120,57 +113,45 @@
 	  <fieldset class="fieldset">
             <legend class="fieldset-legend">Fotografi Assegnati</legend>
 
-            <div class="rounded-xl border border-base-200/60 p-1">
-              <%= render "participations/builder",
-                         form: form,
-                         role: Participation::ROLES[:photographer],
-                         target_list_id: "photographers_list_target" %>
-            </div>
+            <%= render "participations/builder",
+                       form: form,
+                       role: Participation::ROLES[:photographer],
+                       target_list_id: "photographers_list_target" %>
           </fieldset>
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend">Clienti (Referenti Paganti)</legend>
 
-            <div class="rounded-xl border border-base-200/60 p-1">
-              <%= render "participations/builder",
-                         form: form,
-                         role: Participation::ROLES[:client],
-                         target_list_id: "clients_list_target" %>
-            </div>
+            <%= render "participations/builder",
+                       form: form,
+                       role: Participation::ROLES[:client],
+                       target_list_id: "clients_list_target" %>
           </fieldset>
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend">Soggetti (Festeggiati / VIP)</legend>
 
-            <div class="rounded-xl border border-base-200/60 p-1">
-              <%= render "participations/builder",
-                         form: form,
-                         role: Participation::ROLES[:subject],
-                         target_list_id: "subjects_list_target" %>
-            </div>
+            <%= render "participations/builder",
+                       form: form,
+                       role: Participation::ROLES[:subject],
+                       target_list_id: "subjects_list_target" %>
           </fieldset>
         </div>
       </section>
 
-      <div class="divider my-0 opacity-30"></div>
-
-      <%# 4. SEZIONE NOTE %>
-      <section id="sezione-note" class="scroll-mt-32">
+      <%# 4. SEZIONE NOTE & LEGACY %>
+      <section id="sezione-note" class="scroll-mt-32 bg-base-100 p-6 md:p-8 shadow-sm">
 
         <header class="mb-6">
           <h2 class="text-lg font-semibold tracking-tight">Note Operative</h2>
         </header>
 
         <%= form.text_area :notes,
-	 class: "textarea w-full",
-	 rows: 4,
-	 placeholder: "Aggiungi note interne o indicazioni particolari (es. Niente flash durante la cerimonia)..." %>
-      </section>
+	       class: "textarea w-full",
+	       rows: 4,
+	       placeholder: "Aggiungi note interne o indicazioni particolari (es. Niente flash durante la cerimonia)..." %>
 
-      <%# 5. SEZIONE LEGACY %>
-      <section id="sezione-legacy" class="scroll-mt-32 pt-8">
-
-        <details class="collapse collapse-arrow bg-base-200/50">
+        <details class="collapse collapse-arrow">
 
           <summary class="collapse-title font-semibold">Dati Storici / Legacy</summary>
           <div class="collapse-content text-sm">

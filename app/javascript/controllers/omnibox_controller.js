@@ -8,6 +8,22 @@ export default class extends Controller {
 
     connect() {
         this.performSearch = debounce(this.performSearch.bind(this), 300);
+	if (document.documentElement.hasAttribute("data-turbo-preview")) return;
+
+        this.boundPrepareForCache = this.prepareForCache.bind(this);
+        document.addEventListener("turbo:before-cache", this.boundPrepareForCache);
+    }
+
+    disconnect() {
+        document.removeEventListener("turbo:before-cache", this.boundPrepareForCache);
+    }
+
+    prepareForCache() {
+        if (this.element.hasAttribute("open")) {
+            this.element.close();
+        }
+        this.inputTarget.value = "";
+        this.resetState();
     }
 
     search() {

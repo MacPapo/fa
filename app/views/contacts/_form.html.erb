@@ -12,19 +12,19 @@
   <% end %>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend text-lg font-semibold">Tipo di soggetto</legend>
+    <legend class="fieldset-legend text-lg font-semibold text-base-content">Tipo di soggetto</legend>
 
     <div class="flex gap-6 my-3">
       <label class="flex items-center gap-2 cursor-pointer">
         <%= f.radio_button :kind, "person", class: "radio radio-primary",
-		      data: { action: "change->contact-form#toggle", contact_form_target: "personRadio" } %>
-        <span class="label-text font-medium">Persona fisica</span>
+              data: { action: "change->contact-form#toggle", contact_form_target: "personRadio" } %>
+        <span class="label-text font-medium text-base-content">Persona fisica</span>
       </label>
 
       <label class="flex items-center gap-2 cursor-pointer">
         <%= f.radio_button :kind, "company", class: "radio radio-primary",
               data: { action: "change->contact-form#toggle", contact_form_target: "companyRadio" } %>
-        <span class="label-text font-medium">Azienda / Ente / Associazione</span>
+        <span class="label-text font-medium text-base-content">Azienda / Ente / Associazione</span>
       </label>
     </div>
   </fieldset>
@@ -94,7 +94,6 @@
     </div>
   </fieldset>
 
-  <!-- Begin Actions -->
   <div class="modal-action">
 
     <%= f.submit "Salva", class: "btn btn-primary" %>
@@ -107,5 +106,4 @@
     </button>
 
   </div>
-  <!-- End Actions -->
 <% end %>

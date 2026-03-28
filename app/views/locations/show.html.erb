@@ -2,7 +2,7 @@
 
   <%# Subtle Back Link %>
   <div class="mt-6 mb-2">
-    <%= link_to locations_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-base-content/50 hover:text-base-content transition-colors" do %>
+    <%= link_to locations_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-base-content/60 hover:text-base-content transition-colors" do %>
       <%= icon("chevron_left", classes: "size-4") %>
       <span>Torna alle Posizioni</span>
     <% end %>
@@ -16,7 +16,7 @@
 
       <%# Titolo e Badge %>
       <div class="flex items-center flex-wrap gap-2">
-        <h1 class="text-2xl sm:text-3xl font-bold break-words"><%= @location.name %></h1>
+        <h1 class="text-2xl sm:text-3xl font-bold break-words text-base-content"><%= @location.name %></h1>
         <% if @location.district.present? %>
           <div class="badge badge-neutral whitespace-nowrap"><%= @location.district %></div>
         <% end %>
@@ -34,7 +34,7 @@
 
     <%# BLOCCO DESTRA: Azioni (A destra su desktop, a capo su mobile) %>
     <div class="flex items-center gap-2 shrink-0 pt-1">
-      <%= link_to edit_location_path(@location), class: "btn btn-outline btn-sm", data: { turbo_frame: "modal" } do %>
+      <%= link_to edit_location_path(@location), class: "btn btn-outline btn-base-300 btn-sm text-base-content/80 hover:text-base-content", data: { turbo_frame: "modal" } do %>
         <%= icon("edit", classes: "size-4") %>
         <span class="hidden sm:inline">Modifica</span>
       <% end %>
@@ -69,9 +69,9 @@
     <% if @jobs.any? %>
 
       <ul class="list bg-base-100 rounded-box shadow-md">
-        <li class="p-4 pb-2 text-xs opacity-60 tracking-wide flex justify-between items-end">
+        <li class="p-4 pb-2 text-xs text-base-content/60 tracking-wide flex justify-between items-end">
           <span>Storico Servizi</span>
-          <span class="tracking-normal"><%= @pagy.count %> voci</span>
+          <span class="tracking-normal text-base-content"><%= @pagy.count %> voci</span>
         </li>
 
         <%= render partial: "jobs/job", collection: @jobs %>
@@ -83,13 +83,13 @@
       <div class="hero bg-base-100 rounded-box shadow-md py-16">
         <div class="hero-content text-center">
           <div class="max-w-md">
-            <%= icon("photo_library", classes: "size-12 opacity-20 mx-auto mb-4") %>
-            <h2 class="text-xl font-bold">Nessun servizio</h2>
+            <%= icon("photo_library", classes: "size-12 text-base-content/20 mx-auto mb-4") %>
+            <h2 class="text-xl font-bold text-base-content">Nessun servizio</h2>
             <% if params[:query].present? %>
-              <p class="py-4 opacity-60">
-                Non abbiamo trovato nessun servizio per "<strong><%= params[:query] %></strong>" in questa location.</p>
+              <p class="py-4 text-base-content/70">
+                Non abbiamo trovato nessun servizio per "<strong class="text-base-content"><%= params[:query] %></strong>" in questa location.</p>
             <% else %>
-              <p class="py-4 opacity-60">
+              <p class="py-4 text-base-content/70">
                 Non ci sono ancora servizi registrati per questa posizione. Quando assegnerai questa posizione a un servizio, lo vedrai comparire qui.</p>
             <% end %>
           </div>

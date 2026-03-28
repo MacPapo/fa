@@ -8,7 +8,7 @@
     <div class="flex flex-row items-center justify-between gap-4">
 
       <div class="flex items-center gap-3">
-        <h1 class="text-3xl font-bold">Contatti</h1>
+        <h1 class="text-3xl font-bold text-base-content">Contatti</h1>
         <div class="badge badge-ghost font-medium">
           <%= @total_contacts %> totali
         </div>
@@ -45,7 +45,7 @@
 
     <%# Ricerca testuale %>
     <label class="input input-sm flex items-center w-full md:w-72 shrink-0">
-      <%= icon("search", classes: "size-4 opacity-50") %>
+      <%= icon("search", classes: "size-4 text-base-content/50") %>
       <%= f.search_field :query,
        value: params[:query],
        class: "grow",
@@ -59,41 +59,41 @@
       <%# Begin of Filters %>
       <div class="join">
 
-	<%= f.radio_button :filter,
-         '',
-         checked: params[:filter].blank?,
-         class: "join-item btn btn-sm",
+        <%= f.radio_button :filter,
+             '',
+             checked: params[:filter].blank?,
+         class: "join-item btn btn-sm bg-base-100 border-base-300 text-base-content/70 hover:bg-base-200 hover:text-base-content checked:!bg-base-content checked:!text-base-100 checked:!border-base-content",
          aria: {
            label: "Tutti"
          },
          data: {
            action: "change->autosubmit#submit"
          }
-	%>
+        %>
 
-	<%= f.radio_button :filter,
+        <%= f.radio_button :filter,
          "person",
          checked: params[:filter] == "person",
-         class: "join-item btn btn-sm",
+         class: "join-item btn btn-sm bg-base-100 border-base-300 text-base-content/70 hover:bg-base-200 hover:text-base-content checked:!bg-base-content checked:!text-base-100 checked:!border-base-content",
          aria: {
            label: "Persone"
          },
          data: {
            action: "change->autosubmit#submit"
          }
-	%>
+        %>
 
-	<%= f.radio_button :filter,
+        <%= f.radio_button :filter,
          "company",
          checked: params[:filter] == "company",
-         class: "join-item btn btn-sm",
+         class: "join-item btn btn-sm bg-base-100 border-base-300 text-base-content/70 hover:bg-base-200 hover:text-base-content checked:!bg-base-content checked:!text-base-100 checked:!border-base-content",
          aria: {
            label: "Aziende"
          },
          data: {
            action: "change->autosubmit#submit"
          }
-	%>
+        %>
 
       </div>
       <%# End of Filters %>
@@ -133,7 +133,7 @@
 
       <ul class="list bg-base-100 rounded-box shadow-md">
 
-        <li class="p-4 pb-2 text-xs opacity-60 tracking-wide flex justify-between items-end">
+        <li class="p-4 pb-2 text-xs text-base-content/60 tracking-wide flex justify-between items-end">
           <span>Rubrica</span>
           <span class="tracking-normal"><%= @pagy.count %> voci</span>
         </li>
@@ -146,12 +146,12 @@
       <div class="hero bg-base-100 rounded-box shadow-md py-16">
         <div class="hero-content text-center">
           <div class="max-w-md">
-            <%= icon("users", classes: "size-12 opacity-20 mx-auto mb-4") %>
-            <h2 class="text-xl font-bold">Nessun risultato</h2>
+            <%= icon("users", classes: "size-12 text-base-content/20 mx-auto mb-4") %>
+            <h2 class="text-xl font-bold text-base-content">Nessun risultato</h2>
             <% if params[:query].present? %>
-              <p class="py-4 opacity-60">Non abbiamo trovato nulla per "<strong><%= params[:query] %></strong>". Prova a cercare con termini diversi.</p>
+              <p class="py-4 text-base-content/70">Non abbiamo trovato nulla per "<strong class="text-base-content"><%= params[:query] %></strong>". Prova a cercare con termini diversi.</p>
             <% else %>
-              <p class="py-4 opacity-60">La tua rubrica è vuota. Inizia ad aggiungere i tuoi clienti o collaboratori.</p>
+              <p class="py-4 text-base-content/70">La tua rubrica è vuota. Inizia ad aggiungere i tuoi clienti o collaboratori.</p>
             <% end %>
           </div>
         </div>

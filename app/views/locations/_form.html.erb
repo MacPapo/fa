@@ -9,7 +9,6 @@
     <%= hidden_field_tag :target_list_id, params[:target_list_id] %>
   <% end %>
 
-  <!-- Begin Name -->
   <fieldset class="fieldset">
 
     <legend class="fieldset-legend">Nome Posizione *</legend>
@@ -20,10 +19,7 @@
      placeholder: "Piazza San Marco" %>
 
   </fieldset>
-  <!-- End Name -->
-
-  <!-- Begin District -->
-  <fieldset class="fieldset">
+  <fieldset class="fieldset mt-2">
 
     <legend class="fieldset-legend">Zona / Sestiere</legend>
 
@@ -32,9 +28,6 @@
      placeholder: "San Marco" %>
 
   </fieldset>
-  <!-- End District -->
-
-  <!-- Begin Actions -->
   <div class="modal-action">
 
     <%= f.submit "Salva", class: "btn btn-primary" %>
@@ -47,6 +40,4 @@
     </button>
 
   </div>
-  <!-- End Actions -->
-
 <% end %>

@@ -3,7 +3,7 @@
 <div id="<%= dom_id(@job) %>" class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
 
   <div class="mt-6 mb-2">
-    <%= link_to jobs_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-base-content/50 hover:text-base-content transition-colors" do %>
+    <%= link_to jobs_path, class: "inline-flex items-center gap-1.5 text-sm font-medium text-base-content/60 hover:text-base-content transition-colors" do %>
       <%= icon("chevron_left", classes: "size-4") %>
       <span>Torna ai Servizi</span>
     <% end %>
@@ -15,7 +15,7 @@
     <%# BLOCCO SINISTRA: Identità e Contesto %>
     <div class="flex flex-col gap-2 flex-1 min-w-0">
       <div class="flex items-center flex-wrap gap-2">
-        <h1 class="text-2xl sm:text-3xl font-extrabold break-words"><%= @job.display_title %></h1>
+        <h1 class="text-2xl sm:text-3xl font-extrabold break-words text-base-content"><%= @job.display_title %></h1>
         <% if @job.with_video? %>
           <div class="badge badge-primary badge-outline font-bold whitespace-nowrap">VIDEO</div>
         <% end %>
@@ -24,15 +24,15 @@
 
     <%# BLOCCO DESTRA: Azioni Lavoro %>
     <div class="flex items-center gap-2 shrink-0 pt-1">
-      <%= link_to edit_job_path(@job), class: "btn btn-outline btn-sm" do %>
+      <%= link_to edit_job_path(@job), class: "btn btn-outline btn-base-300 btn-sm text-base-content/80 hover:text-base-content" do %>
         <%= icon("edit", classes: "size-4") %>
         <span class="hidden sm:inline">Modifica</span>
       <% end %>
 
       <%= button_to @job,
-		    method: :delete,
-		    class: "btn btn-ghost text-error btn-sm hover:bg-error/10",
-		    data: { turbo_confirm: "Sei sicuro di voler eliminare questo servizio?" } do %>
+            method: :delete,
+            class: "btn btn-ghost text-error btn-sm hover:bg-error/10",
+            data: { turbo_confirm: "Sei sicuro di voler eliminare questo servizio?" } do %>
         <%= icon("trash", classes: "size-4") %>
       <% end %>
     </div>
@@ -55,28 +55,28 @@
       <div class="flex flex-wrap gap-8 p-6 bg-base-100 rounded-box shadow-sm border border-base-200">
 
         <div>
-          <div class="text-xs font-bold uppercase opacity-50 mb-1">Data</div>
-          <div class="text-lg font-medium">
+          <div class="text-xs font-bold uppercase text-base-content/50 mb-1">Data</div>
+          <div class="text-lg font-medium text-base-content">
             <%= @job.date.strftime("%d %B %Y") %>
           </div>
         </div>
 
         <div>
-          <div class="text-xs font-bold uppercase opacity-50 mb-1">Orario</div>
-          <div class="text-lg font-medium">
+          <div class="text-xs font-bold uppercase text-base-content/50 mb-1">Orario</div>
+          <div class="text-lg font-medium text-base-content">
             <% if @job.start_at.present? %>
               <%= @job.start_at.strftime("%H:%M") %> <%= "- #{@job.end_at.strftime('%H:%M')}" if @job.end_at.present? %>
             <% elsif @job.legacy_from_time.present? %>
-              <%= @job.legacy_from_time.strftime("%H:%M") %> <span class="opacity-50 text-sm">(legacy)</span>
+              <%= @job.legacy_from_time.strftime("%H:%M") %> <span class="text-base-content/50 text-sm">(legacy)</span>
             <% else %>
-              <span class="opacity-50 italic">Da definire</span>
+              <span class="text-base-content/50 italic">Da definire</span>
             <% end %>
           </div>
         </div>
 
         <div class="flex-1 min-w-[200px]">
-          <div class="text-xs font-bold uppercase opacity-50 mb-1">Itinerario</div>
-          <div class="text-lg font-medium">
+          <div class="text-xs font-bold uppercase text-base-content/50 mb-1">Itinerario</div>
+          <div class="text-lg font-medium text-base-content">
             <%= @job.display_location %>
           </div>
         </div>
@@ -85,9 +85,10 @@
 
       <%# --- BLOCCO: Note Operative --- %>
       <% if @job.notes.present? %>
-        <div class="p-6 bg-base-200/50 rounded-box border border-base-200">
-          <div class="text-xs font-bold uppercase opacity-50 mb-2">Note Operative</div>
-          <div class="prose prose-sm max-w-none">
+        <%# Tocco di colore semantico: bg-warning/10 invece di base-100 per evidenziare le note %>
+        <div class="p-6 bg-warning/10 rounded-box shadow-sm border-l-4 border-l-warning text-warning-content">
+          <div class="text-xs font-bold uppercase text-warning-content/70 mb-2">Note Operative</div>
+          <div class="prose prose-sm max-w-none text-warning-content/90">
             <%= simple_format(@job.notes) %>
           </div>
         </div>
@@ -95,59 +96,64 @@
 
       <%# --- BLOCCO: Squadra e Contatti --- %>
       <div>
-        <h2 class="text-xl font-bold mb-4">Squadra e Contatti</h2>
+        <h2 class="text-xl font-bold mb-6 text-base-content">Squadra e Contatti</h2>
 
-        <%# Pre-calcoliamo i gruppi filtrando l'array in memoria (NO QUERY N+1) %>
         <% photographers = @job.participations.select { |p| p.role == Participation::ROLES[:photographer] } %>
         <% clients       = @job.participations.select { |p| p.role == Participation::ROLES[:client] } %>
         <% subjects      = @job.participations.select { |p| p.role == Participation::ROLES[:subject] } %>
 
-        <ul class="list bg-base-100 rounded-box shadow-sm border border-base-200">
+        <div class="flex flex-col gap-6">
 
-	  <%# --- FOTOGRAFI --- %>
-	  <li class="p-4 pb-2 text-xs font-bold opacity-50 uppercase tracking-wider">Fotografi</li>
-	  <% if photographers.present? %>
-	    <% photographers.each do |participation| %>
-	      <%= render "contacts/contact",
-			 contact: participation.contact,
-			 subtitle: [participation.title, participation.contact.phone].compact_blank.join(" • "),
-			 hide_actions: true %>
-	    <% end %>
-	  <% else %>
-	    <li class="list-row items-center text-error italic text-sm">
-	      Nessun fotografo assegnato
-	    </li>
-	  <% end %>
+          <%# --- FOTOGRAFI --- %>
+          <section>
+            <h3 class="text-xs font-bold text-base-content/50 uppercase tracking-wider mb-2 px-1">Fotografi</h3>
+            <ul class="list bg-base-100 rounded-box shadow-sm border border-base-200 overflow-hidden">
+              <% if photographers.present? %>
+                <% photographers.each do |participation| %>
+                  <%= render "contacts/contact",
+			     contact: participation.contact,
+			     subtitle: [participation.title, participation.contact.phone].compact_blank.join(" • "),
+			     hide_actions: true %>
+                <% end %>
+              <% else %>
+                <li class="list-row items-center justify-center text-error/80 italic text-sm py-6">
+                  Nessun fotografo assegnato
+                </li>
+              <% end %>
+            </ul>
+          </section>
 
+          <%# --- CLIENTI --- %>
+          <% if clients.present? %>
+            <section>
+              <h3 class="text-xs font-bold text-base-content/50 uppercase tracking-wider mb-2 px-1">Clienti</h3>
+              <ul class="list bg-base-100 rounded-box shadow-sm border border-base-200 overflow-hidden">
+                <% clients.each do |participation| %>
+                  <%= render "contacts/contact",
+			     contact: participation.contact,
+			     subtitle: [participation.title, participation.contact.email].compact_blank.join(" • "),
+			     hide_actions: true %>
+                <% end %>
+              </ul>
+            </section>
+          <% end %>
 
-	  <%# --- CLIENTI --- %>
-	  <% if clients.present? %>
-	    <li class="p-4 pb-2 text-xs font-bold opacity-50 uppercase tracking-wider border-t border-base-200 mt-2">
-	      Clienti
-	    </li>
-	    <% clients.each do |participation| %>
-	      <%= render "contacts/contact",
-			 contact: participation.contact,
-			 subtitle: [participation.title, participation.contact.email].compact_blank.join(" • "),
-			 hide_actions: true %>
-	    <% end %>
-	  <% end %>
+          <%# --- SOGGETTI --- %>
+          <% if subjects.present? %>
+            <section>
+              <h3 class="text-xs font-bold text-base-content/50 uppercase tracking-wider mb-2 px-1">Soggetti Fotografati</h3>
+              <ul class="list bg-base-100 rounded-box shadow-sm border border-base-200 overflow-hidden">
+                <% subjects.each do |participation| %>
+                  <%= render "contacts/contact",
+			     contact: participation.contact,
+			     subtitle: participation.title.present? ? "in veste di #{participation.title}" : nil,
+			     hide_actions: true %>
+                <% end %>
+              </ul>
+            </section>
+          <% end %>
 
-
-	  <%# --- SOGGETTI --- %>
-	  <% if subjects.present? %>
-	    <li class="p-4 pb-2 text-xs font-bold opacity-50 uppercase tracking-wider border-t border-base-200 mt-2">
-	      Soggetti Fotografati
-	    </li>
-	    <% subjects.each do |participation| %>
-	      <%= render "contacts/contact",
-			 contact: participation.contact,
-			 subtitle: participation.title.present? ? "in veste di #{participation.title}" : nil,
-			 hide_actions: true %>
-	    <% end %>
-	  <% end %>
-
-	</ul>
+        </div>
       </div>
 
     </div>
@@ -159,21 +165,21 @@
     <div class="lg:col-span-1 flex flex-col gap-6">
 
       <div class="bg-base-100 rounded-box shadow-sm border border-base-200 p-5 text-sm">
-        <div class="font-bold uppercase opacity-50 mb-4 tracking-wider text-xs">Sistema</div>
+        <div class="font-bold uppercase text-base-content/50 mb-4 tracking-wider text-xs">Sistema</div>
 
-        <div class="flex justify-between items-center py-2 border-b border-base-200">
-          <span class="opacity-60">ID Lavoro</span>
-          <span class="font-mono bg-base-200 px-2 py-0.5 rounded text-xs">#<%= @job.id %></span>
+        <div class="flex justify-between items-center py-2 border-b border-base-200 text-base-content/80">
+          <span>ID Lavoro</span>
+          <span class="font-mono bg-base-200 px-2 py-0.5 rounded text-xs text-base-content">#<%= @job.id %></span>
         </div>
 
-        <div class="flex justify-between items-center py-2 border-b border-base-200">
-          <span class="opacity-60">Creato il</span>
-          <span class="font-medium"><%= @job.created_at.strftime("%d/%m/%y") %></span>
+        <div class="flex justify-between items-center py-2 border-b border-base-200 text-base-content/80">
+          <span>Creato il</span>
+          <span class="font-medium text-base-content"><%= @job.created_at.strftime("%d/%m/%y") %></span>
         </div>
 
-        <div class="flex justify-between items-center py-2">
-          <span class="opacity-60">Aggiornato</span>
-          <span class="font-medium"><%= time_ago_in_words(@job.updated_at) %> fa</span>
+        <div class="flex justify-between items-center py-2 text-base-content/80">
+          <span>Aggiornato</span>
+          <span class="font-medium text-base-content"><%= time_ago_in_words(@job.updated_at) %> fa</span>
         </div>
       </div>
 
@@ -181,11 +187,11 @@
       <% if @job.legacy_data.present? && @job.legacy_data.keys.present? %>
         <div class="collapse collapse-arrow bg-base-100 shadow-sm border border-base-200">
           <input type="checkbox" />
-          <div class="collapse-title text-sm font-bold opacity-70 flex items-center gap-2">
+          <div class="collapse-title text-sm font-bold text-base-content/70 flex items-center gap-2">
             Dati Legacy (JSON)
           </div>
           <div class="collapse-content">
-            <pre class="bg-base-200 p-3 rounded-box text-xs font-mono overflow-x-auto"><code><%= JSON.pretty_generate(@job.legacy_data) %></code></pre>
+            <pre class="bg-base-200 p-3 rounded-box text-xs font-mono text-base-content/80 overflow-x-auto"><code><%= JSON.pretty_generate(@job.legacy_data) %></code></pre>
           </div>
         </div>
       <% end %>
