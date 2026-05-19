@@ -16,7 +16,11 @@
     <%= f.text_field :name,
      class: "input w-full",
      id: local_assigns[:input_id],
-     placeholder: "Piazza San Marco" %>
+     placeholder: "Piazza San Marco",
+     autocomplete: "address-line1",
+     autocorrect: "off",
+     autocapitalize: "words",
+     spellcheck: "false" %>
 
   </fieldset>
   <fieldset class="fieldset mt-2">
@@ -25,7 +29,11 @@
 
     <%= f.text_field :district,
      class: "input w-full",
-     placeholder: "San Marco" %>
+     placeholder: "San Marco",
+     autocomplete: "address-level3",
+     autocorrect: "off",
+     autocapitalize: "words",
+     spellcheck: "false" %>
 
   </fieldset>
   <div class="modal-action">

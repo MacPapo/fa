@@ -13,7 +13,10 @@
       <input type="text"
              class="flex-1 w-full bg-transparent text-xl font-medium focus:outline-none placeholder-base-content/40"
              placeholder="Cerca lavori, contatti, posizioni..."
-             autocomplete="off"
+             autocomplete="search"
+             autocorrect="off"
+             autocapitalize="none"
+             spellcheck="false"
              data-omnibox-target="input"
              data-url="<%= searches_path %>"
              data-action="input->omnibox#search keydown->keyboard-nav#navigate">
