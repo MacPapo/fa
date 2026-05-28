@@ -16,7 +16,8 @@ class JobsController < ApplicationController
 
   # GET /jobs/new
   def new
-    @job = Job.new(date: Date.today, start_at: Time.now, end_at: Time.now)
+    now = Time.current.change(sec: 0)
+    @job = Job.new(date: Date.today, start_at: now, end_at: now)
   end
 
   # GET /jobs/1/edit

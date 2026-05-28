@@ -29,6 +29,15 @@ class Job < ApplicationRecord
 
   json_accessor :legacy_data, :from_time, :to_time, :legacy_location_text
 
+  # datetime fix
+  def start_at
+    self[:start_at]&.change(sec: 0)
+  end
+
+  def end_at
+    self[:end_at]&.change(sec: 0)
+  end
+
   def legacy_from_time
     return nil if from_time.blank?
     Time.parse(from_time) rescue nil

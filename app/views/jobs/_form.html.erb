@@ -54,17 +54,24 @@
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <fieldset class="fieldset">
               <%= form.label :date, "Data *", class: "label" %>
-              <%= form.date_field :date, class: "input w-full" %>
+              <%= form.date_field :date,
+	       class: "input w-full",
+	       required: true %>
             </fieldset>
 
             <fieldset class="fieldset">
               <%= form.label :start_at, "Inizio", class: "label" %>
-              <%= form.datetime_field :start_at, class: "input w-full" %>
+              <%= form.datetime_local_field :start_at,
+	       class: "input w-full",
+	       step: 60
+	      %>
             </fieldset>
 
             <fieldset class="fieldset">
               <%= form.label :end_at, "Fine", class: "label" %>
-              <%= form.datetime_field :end_at, class: "input w-full" %>
+              <%= form.datetime_local_field :end_at,
+	       class: "input w-full",
+	       step: 60 %>
             </fieldset>
           </div>
 
@@ -83,7 +90,8 @@
             <%= form.text_area :description,
 	     class: "textarea w-full",
 	     rows: 4,
-	     placeholder: "Descrivi le attività principali..." %>
+	     placeholder: "Descrivi le attività principali...",
+	     required: true %>
           </fieldset>
         </div>
       </section>
